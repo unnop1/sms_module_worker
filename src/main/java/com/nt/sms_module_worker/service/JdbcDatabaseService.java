@@ -2,26 +2,10 @@ package com.nt.sms_module_worker.service;
 // Java Program Illustrating Utility class for Connecting
 // and Querying the Databas
 
-import java.security.PublicKey;
 import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.Statement;
-import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.List;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.DatabaseMetaData;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.kafka.annotation.EnableKafka;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
-
-import com.nt.sms_module_worker.model.dto.OrderTypeData;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
