@@ -11,20 +11,17 @@ import net.sf.jsqlparser.expression.DateTimeLiteralExpression.DateTime;
 @Getter
 @Setter
 public class SmsConditionData {
-    private Long SMSID = null;
+    private Long conditionsID = null;
     private Long order_type_MainID = null;
-    private String OrderType = null;
-    private String Message = null;
-    private String Chanel = null;
-    private String Frequency = null;
-    private Integer serviceType = null;
-    private String by_offeringId = null;
-    private Date DateStart = null;
-    private Date DateEnd = null;
-    private Boolean IsEnable = true;
-    private Boolean IsDelete = false;
-    private Timestamp CreatedDate = null;
-    private Long CreatedBy_UserID = null;
-    private Timestamp UpdatedDate = null;
-    private Long UpdatedBy_UserID = null;
+    private String orderType = null;
+    private String refID = null;
+    private Date dateStart = null;
+    private Date dateEnd = null;
+    private String message = null;
+    private String messageRaw = null;
+    private String conditions_or = null;
+    private String conditions_and = null;
+    private DateTime createdDate = null;
+    private Long createdBy_userID = null;
+    private DateTime updatedDate = null;
 }

@@ -1,13 +1,9 @@
 package com.nt.sms_module_worker.model.dto;
 
-
-import java.sql.Date;
-
 import java.sql.Timestamp;
 
 import lombok.Getter;
 import lombok.Setter;
-import net.sf.jsqlparser.expression.DateTimeLiteralExpression.DateTime;
 
 @Getter
 @Setter

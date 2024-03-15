@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.nt.sms_module_worker.model.dto.OrderTypeData;
-import com.nt.sms_module_worker.model.dto.ReceivedData;
+import com.nt.sms_module_worker.model.dto.distribute.ReceivedData;
 
 
 @Component
@@ -72,7 +72,7 @@ public class OrderTypeService {
     public String getQueryOrderTypeAvailable(ReceivedData receivedData) {
         String tableName = "order_type";
         String query = "SELECT * FROM "+ tableName +
-                    " WHERE OrderTypeName='" + receivedData.getOrder_type() + "'" +
+                    " WHERE OrderTypeName='" + receivedData.getOrderType() + "'" +
                     " AND IsEnable=1" +
                     " AND IsDelete=0" ;
 
