@@ -208,7 +208,7 @@ public boolean doArrayOperation(String operation_type, String conditionKey,JSONO
             }
             return found;
         default:
-            return false;
+            return true;
     }
 }
 
