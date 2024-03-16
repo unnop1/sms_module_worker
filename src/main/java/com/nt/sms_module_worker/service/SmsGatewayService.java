@@ -141,7 +141,7 @@ class SmsGatewayService {
           e.printStackTrace();
       }
     }
-    System.out.println("GID: " + smsGatewayData.getGID().toString());
+    // System.out.println("GID: " + smsGatewayData.getGID().toString());
     return smsGatewayData;
   }
 
