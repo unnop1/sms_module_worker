@@ -84,6 +84,7 @@ public class KafkaConsumerService {
             
             if (smsConditions.size() > 0) {    
                 // send sms
+                System.out.println("smsConditions.size(): " + smsConditions.size() );
                 for (SmsConditionData condition : smsConditions) {
                     JSONObject jsonData = new JSONObject(messageMq);
                     if (smsConditionService.checkSendSms(condition, jsonData)){
@@ -93,6 +94,7 @@ public class KafkaConsumerService {
                         Instant instant = Instant.now();
                         Timestamp createdDate = Timestamp.from(instant);
                         smsMatchConditionGw.setSMSMessage(smsMessage);
+                        smsMatchConditionGw.setSms_condition_SMSID(condition.getConditionsID());
                         smsMatchConditionGw.setPhoneNumber(receivedData.getMsisdn());
                         smsMatchConditionGw.setChanel(receivedData.getPublishChannel());
                         smsMatchConditionGw.setIsStatus(0);

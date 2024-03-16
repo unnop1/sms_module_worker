@@ -76,6 +76,8 @@ public class SmsConditionService {
               smsConditionData.setOrderType(rs.getString("orderType"));
               smsConditionData.setMessage(rs.getString("Message"));
               smsConditionData.setOrder_type_MainID(rs.getLong("order_type_MainID"));
+              smsConditionData.setConditions_or(rs.getString("conditions_or"));
+              smsConditionData.setConditions_and(rs.getString("conditions_and"));
               smsConditionData.setDateStart(rs.getDate("DateStart"));
               smsConditionData.setDateEnd(rs.getDate("DateEnd"));
               conditionDataList.add(smsConditionData);
@@ -105,6 +107,9 @@ public class SmsConditionService {
 
 
   public boolean checkSendSms(SmsConditionData smsCondition , JSONObject jsonData) throws JsonMappingException, JsonProcessingException {
+    System.out.println("smsCondition.getConditions_or:"+smsCondition.getConditions_or());
+    System.out.println("smsCondition.getConditions_and:"+smsCondition.getConditions_and());
+
     JSONArray jsonSmsOrCon = new JSONArray(smsCondition.getConditions_or());
     JSONArray jsonSmsAndCon = new JSONArray(smsCondition.getConditions_and());
     
