@@ -73,6 +73,7 @@ public class SmsConditionService {
       try{          
           while (rs.next()) {
               SmsConditionData smsConditionData = new SmsConditionData();
+              smsConditionData.setConditionsID(rs.getLong("conditionsID"));
               smsConditionData.setOrderType(rs.getString("orderType"));
               smsConditionData.setMessage(rs.getString("Message"));
               smsConditionData.setOrder_type_MainID(rs.getLong("order_type_MainID"));
