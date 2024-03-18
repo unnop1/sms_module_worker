@@ -73,10 +73,9 @@ public class OrderTypeService {
         String tableName = "order_type";
         String query = "SELECT * FROM "+ tableName +
                     " WHERE OrderTypeName='" + receivedData.getOrderType() + "'" +
-                    " AND IsEnable=1" +
                     " AND IsDelete=0" ;
 
-        System.out.println("query ordertype : "+query);
+        // System.out.println("query ordertype : "+query);
         return query;
         
     }

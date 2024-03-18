@@ -25,6 +25,8 @@ public class SmsGatewayData {
     private String Chanel = null;
     private String OfferingId = null;
     private String PayloadMQ = null;
+    private String PayloadGW = null;
     private Integer IsStatus = 0;
+    private String remark = null;
     private Timestamp CreatedDate = null;
 }

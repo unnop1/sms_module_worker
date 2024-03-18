@@ -43,7 +43,7 @@ public class KafkaConsumerService {
         groupId = "sms_module.worker"
     )
     public void listening(@Payload String message, @Header(KafkaHeaders.RECEIVED_TOPIC) String topic) throws Exception {
-        System.out.println("Received message from topic " + topic);
+        // System.out.println("Received message from topic " + topic);
 
         try {
             
@@ -64,7 +64,7 @@ public class KafkaConsumerService {
 
         String queryOrderType = orderTypeService.getQueryOrderTypeAvailable(receivedData); 
         OrderTypeData orderTypeData = orderTypeService.getOrderType(queryOrderType);
-        if (orderTypeData == null){
+        if (orderTypeData.getOrderTypeName() == null){
             Instant instant = Instant.now();
             Timestamp createdDate = Timestamp.from(instant);
             SmsGatewayData smsMisMatchConditionGw = new SmsGatewayData();
@@ -75,89 +75,111 @@ public class KafkaConsumerService {
             smsMisMatchConditionGw.setServiceType(receivedData.getEventData().getEventItem().getOffer().getServiceType());
             smsMisMatchConditionGw.setIsStatus(2);
             smsMisMatchConditionGw.setPayloadMQ(messageMq);
+            smsMisMatchConditionGw.setRemark("ไม่พบ OrderType "+receivedData.getOrderType());
             smsMisMatchConditionGw.setCreatedDate(createdDate);
             smsGatewayService.createConditionalMessage(smsMisMatchConditionGw);
         }else{
-            System.out.println("orderTypeData: " + orderTypeData.getOrderTypeName() );
-            String querySmsCondition = smsConditionService.getQueryOrderTypeSmsCondition(receivedData);
-            List<SmsConditionData> smsConditions = smsConditionService.getListSmsCondition(querySmsCondition);
-            
-            if (smsConditions.size() > 0) {    
-                // send sms
-                System.out.println("smsConditions size: " + smsConditions.size() );
-                for (SmsConditionData condition : smsConditions) {
-                    JSONObject jsonData = new JSONObject(messageMq);
-                    if (smsConditionService.checkSendSms(condition, jsonData)){
-                        // System.out.println("condition.getSMSID(): " + condition.getSMSID());
-                        String smsMessage = condition.getMessage();
-                        SmsGatewayData smsMatchConditionGw = new SmsGatewayData();
-                        Instant instant = Instant.now();
-                        Timestamp createdDate = Timestamp.from(instant);
-                        smsMatchConditionGw.setSMSMessage(smsMessage);
-                        System.out.println("condition.getConditionsID: " + condition.getConditionsID() );
-                        smsMatchConditionGw.setSms_condition_SMSID(condition.getConditionsID());
-                        smsMatchConditionGw.setPhoneNumber(receivedData.getMsisdn());
-                        smsMatchConditionGw.setChanel(receivedData.getPublishChannel());
-                        smsMatchConditionGw.setIsStatus(0);
-                        smsMatchConditionGw.setOfferingId(receivedData.getEventData().getEventItem().getOffer().getOfferingType());
-                        smsMatchConditionGw.setOrderType(receivedData.getOrderType().toUpperCase());
-                        smsMatchConditionGw.setServiceType(receivedData.getEventData().getEventItem().getOffer().getServiceType());
-                        smsMatchConditionGw.setOrder_type_MainID(orderTypeData.getMainID());
-                        smsMatchConditionGw.setPayloadMQ(messageMq);
-                        smsMatchConditionGw.setCreatedDate(createdDate);
-                        smsMatchConditionGw = smsGatewayService.createConditionalMessage(smsMatchConditionGw);
-                        System.out.println("smsMessage: " + smsMessage + " to phone " + receivedData.getMsisdn() );
-                        
-                        
-                        // for (int sendSmsCount = 1; sendSmsCount <= MaxRetrySendSmsCount ; sendSmsCount++) {
-                        //     try{
-                        //         smsConditionService.publish("","sms_target" , smsMessage);
-                        //     }catch (Exception e){
-                        //         if (sendSmsCount >= MaxRetrySendSmsCount){
-                        //             Map<String, Object> updateInfo = new HashMap<String, Object>();
-                        //             updateInfo.put("IsStatus", 3);
-                        //             smsGatewayService.updateConditionalMessageById(smsMatchConditionGw.getGID(), updateInfo);
-                        //             return;
-                        //         }
-                        //         System.out.println("Error round "+sendSmsCount+" publishing: " + e.getMessage());
-                        //     }
-                        // }
-                        Map<String, Object> updateInfo = new HashMap<String, Object>();
-                        updateInfo.put("IsStatus", 1);
-                        System.out.println("smsMatchConditionGw.getGID: " + smsMatchConditionGw.getGID() );
-                        smsGatewayService.updateConditionalMessageById(smsMatchConditionGw.getGID(), updateInfo);
-                    }else{
-                        Instant instant = Instant.now();
-                        Timestamp createdDate = Timestamp.from(instant);
-                        SmsGatewayData smsMisMatchConditionGw = new SmsGatewayData();
-                        smsMisMatchConditionGw.setPhoneNumber(receivedData.getMsisdn());
-                        smsMisMatchConditionGw.setChanel(receivedData.getPublishChannel());
-                        smsMisMatchConditionGw.setOfferingId(receivedData.getEventData().getEventItem().getOffer().getOfferingType());
-                        smsMisMatchConditionGw.setOrderType(receivedData.getOrderType().toUpperCase());
-                        smsMisMatchConditionGw.setServiceType(receivedData.getEventData().getEventItem().getOffer().getServiceType());
-                        smsMisMatchConditionGw.setOrder_type_MainID(orderTypeData.getMainID());
-                        smsMisMatchConditionGw.setIsStatus(2);
-                        smsMisMatchConditionGw.setPayloadMQ(messageMq);
-                        smsMisMatchConditionGw.setCreatedDate(createdDate);
-                        smsGatewayService.createConditionalMessage(smsMisMatchConditionGw);
+            // System.out.println("orderTypeData: " + orderTypeData.getOrderTypeName() );
+            boolean isEnableOrderType = orderTypeData.getIsEnable();
+            // System.out.println("isEnableOrderType: " + isEnableOrderType );
+            if (isEnableOrderType){
+                // System.out.println("smsEnableConditionGw remark" );
+                String querySmsCondition = smsConditionService.getQueryOrderTypeSmsCondition(receivedData);
+                List<SmsConditionData> smsConditions = smsConditionService.getListSmsCondition(querySmsCondition);
+                
+                if (smsConditions.size() > 0) {    
+                    // send sms
+                    // System.out.println("smsConditions size: " + smsConditions.size() );
+                    for (SmsConditionData condition : smsConditions) {
+                        JSONObject jsonData = new JSONObject(messageMq);
+                        if (smsConditionService.checkSendSms(condition, jsonData)){
+                            // System.out.println("condition.getSMSID(): " + condition.getSMSID());
+                            String smsMessage = condition.getMessage();
+                            SmsGatewayData smsMatchConditionGw = new SmsGatewayData();
+                            Instant instant = Instant.now();
+                            Timestamp createdDate = Timestamp.from(instant);
+                            smsMatchConditionGw.setSMSMessage(smsMessage);
+                            // System.out.println("condition.getConditionsID: " + condition.getConditionsID() );
+                            smsMatchConditionGw.setSms_condition_SMSID(condition.getConditionsID());
+                            smsMatchConditionGw.setPhoneNumber(receivedData.getMsisdn());
+                            smsMatchConditionGw.setChanel(receivedData.getPublishChannel());
+                            smsMatchConditionGw.setIsStatus(0);
+                            smsMatchConditionGw.setOfferingId(receivedData.getEventData().getEventItem().getOffer().getOfferingType());
+                            smsMatchConditionGw.setOrderType(receivedData.getOrderType().toUpperCase());
+                            smsMatchConditionGw.setServiceType(receivedData.getEventData().getEventItem().getOffer().getServiceType());
+                            smsMatchConditionGw.setOrder_type_MainID(orderTypeData.getMainID());
+                            smsMatchConditionGw.setPayloadMQ(messageMq);
+                            smsMatchConditionGw.setCreatedDate(createdDate);
+                            smsMatchConditionGw = smsGatewayService.createConditionalMessage(smsMatchConditionGw);
+                            // System.out.println("smsMessage: " + smsMessage + " to phone " + receivedData.getMsisdn() );
+                            
+                            
+                            // for (int sendSmsCount = 1; sendSmsCount <= MaxRetrySendSmsCount ; sendSmsCount++) {
+                            //     try{
+                            //         smsConditionService.publish("","sms_target" , smsMessage);
+                            //     }catch (Exception e){
+                            //         if (sendSmsCount >= MaxRetrySendSmsCount){
+                            //             Map<String, Object> updateInfo = new HashMap<String, Object>();
+                            //             updateInfo.put("IsStatus", 3);
+                            //             smsGatewayService.updateConditionalMessageById(smsMatchConditionGw.getGID(), updateInfo);
+                            //             return;
+                            //         }
+                            //         System.out.println("Error round "+sendSmsCount+" publishing: " + e.getMessage());
+                            //     }
+                            // }
+                            Map<String, Object> updateInfo = new HashMap<String, Object>();
+                            updateInfo.put("IsStatus", 1);
+                            // System.out.println("smsMatchConditionGw.getGID: " + smsMatchConditionGw.getGID() );
+                            smsGatewayService.updateConditionalMessageById(smsMatchConditionGw.getGID(), updateInfo);
+                        }else{
+                            Instant instant = Instant.now();
+                            Timestamp createdDate = Timestamp.from(instant);
+                            SmsGatewayData smsMisMatchConditionGw = new SmsGatewayData();
+                            smsMisMatchConditionGw.setPhoneNumber(receivedData.getMsisdn());
+                            smsMisMatchConditionGw.setChanel(receivedData.getPublishChannel());
+                            smsMisMatchConditionGw.setOfferingId(receivedData.getEventData().getEventItem().getOffer().getOfferingType());
+                            smsMisMatchConditionGw.setOrderType(receivedData.getOrderType().toUpperCase());
+                            smsMisMatchConditionGw.setServiceType(receivedData.getEventData().getEventItem().getOffer().getServiceType());
+                            smsMisMatchConditionGw.setOrder_type_MainID(orderTypeData.getMainID());
+                            smsMisMatchConditionGw.setIsStatus(2);
+                            smsMisMatchConditionGw.setPayloadMQ(messageMq);
+                            smsMisMatchConditionGw.setCreatedDate(createdDate);
+                            smsGatewayService.createConditionalMessage(smsMisMatchConditionGw);
+                        }
                     }
-                }
 
+                }else{
+                    Instant instant = Instant.now();
+                    Timestamp createdDate = Timestamp.from(instant);
+                    SmsGatewayData smsMisMatchConditionGw = new SmsGatewayData();
+                    smsMisMatchConditionGw.setPhoneNumber(receivedData.getMsisdn());
+                    smsMisMatchConditionGw.setChanel(receivedData.getPublishChannel());
+                    smsMisMatchConditionGw.setOfferingId(receivedData.getEventData().getEventItem().getOffer().getOfferingType());
+                    smsMisMatchConditionGw.setOrderType(receivedData.getOrderType().toUpperCase());
+                    smsMisMatchConditionGw.setServiceType(receivedData.getEventData().getEventItem().getOffer().getServiceType());
+                    smsMisMatchConditionGw.setOrder_type_MainID(orderTypeData.getMainID());
+                    smsMisMatchConditionGw.setIsStatus(2);
+                    smsMisMatchConditionGw.setPayloadMQ(messageMq);
+                    smsMisMatchConditionGw.setCreatedDate(createdDate);
+                    smsGatewayService.createConditionalMessage(smsMisMatchConditionGw);
+                }
             }else{
                 Instant instant = Instant.now();
                 Timestamp createdDate = Timestamp.from(instant);
-                SmsGatewayData smsMisMatchConditionGw = new SmsGatewayData();
-                smsMisMatchConditionGw.setPhoneNumber(receivedData.getMsisdn());
-                smsMisMatchConditionGw.setChanel(receivedData.getPublishChannel());
-                smsMisMatchConditionGw.setOfferingId(receivedData.getEventData().getEventItem().getOffer().getOfferingType());
-                smsMisMatchConditionGw.setOrderType(receivedData.getOrderType().toUpperCase());
-                smsMisMatchConditionGw.setServiceType(receivedData.getEventData().getEventItem().getOffer().getServiceType());
-                smsMisMatchConditionGw.setOrder_type_MainID(orderTypeData.getMainID());
-                smsMisMatchConditionGw.setIsStatus(2);
-                smsMisMatchConditionGw.setPayloadMQ(messageMq);
-                smsMisMatchConditionGw.setCreatedDate(createdDate);
-                smsGatewayService.createConditionalMessage(smsMisMatchConditionGw);
+                SmsGatewayData smsNotEnableConditionGw = new SmsGatewayData();
+                smsNotEnableConditionGw.setPhoneNumber(receivedData.getMsisdn());
+                smsNotEnableConditionGw.setChanel(receivedData.getPublishChannel());
+                smsNotEnableConditionGw.setOfferingId(receivedData.getEventData().getEventItem().getOffer().getOfferingType());
+                smsNotEnableConditionGw.setOrderType(receivedData.getOrderType().toUpperCase());
+                smsNotEnableConditionGw.setServiceType(receivedData.getEventData().getEventItem().getOffer().getServiceType());
+                smsNotEnableConditionGw.setIsStatus(2);
+                smsNotEnableConditionGw.setPayloadMQ(messageMq);
+                smsNotEnableConditionGw.setCreatedDate(createdDate);
+                smsNotEnableConditionGw.setRemark("OrderType "+orderTypeData.getOrderTypeName()+" ถูกปิด");
+                smsGatewayService.createConditionalMessage(smsNotEnableConditionGw);
+                // System.out.println("smsNotEnableConditionGw remark: " + smsNotEnableConditionGw.getRemark() );
             }
+        
         }
     }
 

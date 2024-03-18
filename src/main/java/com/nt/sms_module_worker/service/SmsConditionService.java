@@ -40,7 +40,7 @@ public class SmsConditionService {
   }
 
   public void publish(String exchangeName, String routingKey,String message) throws Exception {
-    System.out.println("Sending message...");
+    // System.out.println("Sending message...");
     rabbitTemplate.convertAndSend("", routingKey, message);
     // receiver.getLatch().await(10000, TimeUnit.MILLISECONDS);
   }
@@ -52,11 +52,11 @@ public class SmsConditionService {
     String tableName = "config_conditions";
 
     String query = "SELECT * FROM "+ tableName +
-                  " WHERE ( OrderType ='" + receivedData.getOrderType() + "'" + " OR OrderType IS NULL )" +
-                  " AND ( DateStart <='" + currentDate + "'" + " OR DateStart IS NULL )" +
-                  " AND ( DateEnd >='" + currentDate + "'" + " OR DateEnd IS NULL )";        
+                  " WHERE ( orderType ='" + receivedData.getOrderType() + "'" + " OR orderType IS NULL )" +
+                  " AND ( dateStart <='" + currentDate + "'" + " OR dateStart IS NULL )" +
+                  " AND ( dateEnd >='" + currentDate + "'" + " OR dateEnd IS NULL )";        
                   
-    System.out.println("query condition : "+query);
+    // System.out.println("query condition : "+query);
     return query;
     
   }
@@ -108,8 +108,8 @@ public class SmsConditionService {
 
 
   public boolean checkSendSms(SmsConditionData smsCondition , JSONObject jsonData) throws JsonMappingException, JsonProcessingException {
-    System.out.println("smsCondition.getConditions_or:"+smsCondition.getConditions_or());
-    System.out.println("smsCondition.getConditions_and:"+smsCondition.getConditions_and());
+    // System.out.println("smsCondition.getConditions_or:"+smsCondition.getConditions_or());
+    // System.out.println("smsCondition.getConditions_and:"+smsCondition.getConditions_and());
 
     JSONArray jsonSmsOrCon = new JSONArray(smsCondition.getConditions_or());
     JSONArray jsonSmsAndCon = new JSONArray(smsCondition.getConditions_and());
@@ -253,13 +253,13 @@ public boolean checkOrCondition(JSONObject orConf, JSONObject jsonData){
         boolean isNoCondition = true;
         String orConfType = checkFieldType(orConf, conditionKey);
         String dataType = checkFieldType(jsonData, conditionKey);
-        System.out.println(conditionKey+ " have conf type "+ orConfType +" and data type "+ dataType);
+        // System.out.println(conditionKey+ " have conf type "+ orConfType +" and data type "+ dataType);
         if(orConfType == "ValueConfig"){
             // String dataValue = jsonData.getString(key);
             JSONObject orValueConfig = orConf.getJSONObject(conditionKey);
             // String operation_type = orConfValue.getString("operation_type");
             isNoCondition = doCondition(jsonData, conditionKey, orValueConfig);
-            System.out.println(conditionKey+ " have conf type "+ orConfType +" and data type "+ dataType + ", isNoCondition is "+isNoCondition);
+            // System.out.println(conditionKey+ " have conf type "+ orConfType +" and data type "+ dataType + ", isNoCondition is "+isNoCondition);
             if (isNoCondition){
                 return true;
             }
@@ -281,13 +281,13 @@ public boolean checkAndCondition(JSONObject orConf, JSONObject jsonData){
         boolean isCondition = false;
         String orConfType = checkFieldType(orConf, conditionKey);
         String dataType = checkFieldType(jsonData, conditionKey);
-        System.out.println(conditionKey+ " have conf type "+ orConfType +" and data type "+ dataType);
+        // System.out.println(conditionKey+ " have conf type "+ orConfType +" and data type "+ dataType);
         if(orConfType == "ValueConfig"){
             // String dataValue = jsonData.getString(key);
             JSONObject orValueConfig = orConf.getJSONObject(conditionKey);
             // String operation_type = orConfValue.getString("operation_type");
             isCondition = doCondition(jsonData, conditionKey, orValueConfig);
-            System.out.println(conditionKey+ " have conf type "+ orConfType +" and data type "+ dataType + ", isCondition is "+isCondition);
+            // System.out.println(conditionKey+ " have conf type "+ orConfType +" and data type "+ dataType + ", isCondition is "+isCondition);
             if (!isCondition){
                 return false;
             }

@@ -31,8 +31,8 @@ class SmsGatewayService {
     try {
       // Define the SQL INSERT statement
       String insertQuery = "INSERT INTO "+ tableName +
-            " (sms_conditions_SMSID, SMSMessage, order_type_MainID, OrderType, PhoneNumber, serviceType, Frequency, Chanel, PayloadMQ, IsStatus, CreatedDate, OfferingId )" + 
-            " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            " (sms_conditions_SMSID, SMSMessage, order_type_MainID, OrderType, PhoneNumber, serviceType, Frequency, Chanel, PayloadMQ, IsStatus, CreatedDate, OfferingId, remark )" + 
+            " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
       // Create a PreparedStatement with the insertQuery
       statement = con.prepareStatement(insertQuery, Statement.RETURN_GENERATED_KEYS);
@@ -110,10 +110,16 @@ class SmsGatewayService {
       }else {
         statement.setNull(12, java.sql.Types.VARCHAR);
       }
+
+      if (smsGatewayData.getRemark() != null) {
+        statement.setString(13,smsGatewayData.getRemark());
+      }else {
+        statement.setNull(13, java.sql.Types.VARCHAR);
+      }
       
       // Execute the insert operation
       int rowsInserted = statement.executeUpdate();
-      System.out.println("Rows inserted: " + rowsInserted);
+      // System.out.println("Rows inserted: " + rowsInserted);
       if (rowsInserted > 0) {
           // Retrieve the generated keys
           try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
@@ -172,11 +178,11 @@ class SmsGatewayService {
         for (Object value : values) {
             statement.setObject(index++, value);
         }
-        System.out.println("updateQuery: " + updateQuery);
+        // System.out.println("updateQuery: " + updateQuery);
 
         // Execute the update operation
         int rowsUpdated = statement.executeUpdate();
-        System.out.println("Rows updated: " + rowsUpdated);
+        // System.out.println("Rows updated: " + rowsUpdated);
     } catch (SQLException e) {
         System.out.println("Error: " + e.getMessage());
     } finally {

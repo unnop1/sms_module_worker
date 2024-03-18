@@ -11,7 +11,7 @@ public class OrderTypeData {
     private Long TYPEID = null;
     private Long MainID = null;
     private String OrderTypeName = null;
-    private Boolean IsEnable = true;
+    private Boolean IsEnable = false;
     private Boolean IsDelete = false;
     private Timestamp CreatedDate = null;
     private Long CreatedBy_UserID = null;
