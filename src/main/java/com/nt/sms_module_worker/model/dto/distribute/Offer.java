@@ -10,9 +10,12 @@ import lombok.Setter;
 public class Offer {
     @JsonProperty("offeringType")
     private String offeringType;
-    
+
     @JsonProperty("ServiceType")
     private Integer ServiceType;
+    
+    @JsonProperty("frequency")
+    private String frequency;
 
     @JsonProperty("rcAmount")
     private Integer rcAmount;
