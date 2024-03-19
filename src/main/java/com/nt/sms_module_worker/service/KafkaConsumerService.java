@@ -135,7 +135,10 @@ public class KafkaConsumerService {
                             Instant instant = Instant.now();
                             Timestamp createdDate = Timestamp.from(instant);
                             SmsGatewayData smsMisMatchConditionGw = new SmsGatewayData();
+                            smsMisMatchConditionGw.setSms_condition_SMSID(condition.getConditionsID());
+                            smsMisMatchConditionGw.setSMSMessage(condition.getMessage());
                             smsMisMatchConditionGw.setPhoneNumber(receivedData.getMsisdn());
+                            smsMisMatchConditionGw.setFrequency(receivedData.getEventData().getEventItem().getOffer().getFrequency());
                             smsMisMatchConditionGw.setChanel(receivedData.getPublishChannel());
                             smsMisMatchConditionGw.setOfferingId(receivedData.getEventData().getEventItem().getOffer().getOfferingType());
                             smsMisMatchConditionGw.setOrderType(receivedData.getOrderType().toUpperCase());
