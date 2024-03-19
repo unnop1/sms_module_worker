@@ -90,10 +90,12 @@ public class KafkaConsumerService {
                 if (smsConditions.size() > 0) {    
                     // send sms
                     // System.out.println("smsConditions size: " + smsConditions.size() );
+                    boolean isNotMatchCondition = true;
                     for (SmsConditionData condition : smsConditions) {
                         JSONObject jsonData = new JSONObject(messageMq);
                         if (smsConditionService.checkSendSms(condition, jsonData)){
                             // System.out.println("condition.getSMSID(): " + condition.getSMSID());
+                            isNotMatchCondition = false;
                             String smsMessage = condition.getMessage();
                             SmsGatewayData smsMatchConditionGw = new SmsGatewayData();
                             Instant instant = Instant.now();
@@ -132,24 +134,24 @@ public class KafkaConsumerService {
                             updateInfo.put("IsStatus", 1);
                             // System.out.println("smsMatchConditionGw.getGID: " + smsMatchConditionGw.getGID() );
                             smsGatewayService.updateConditionalMessageById(smsMatchConditionGw.getGID(), updateInfo);
-                        }else{
-                            Instant instant = Instant.now();
-                            Timestamp createdDate = Timestamp.from(instant);
-                            SmsGatewayData smsMisMatchConditionGw = new SmsGatewayData();
-                            smsMisMatchConditionGw.setSms_condition_SMSID(condition.getConditionsID());
-                            smsMisMatchConditionGw.setSMSMessage(condition.getMessage());
-                            smsMisMatchConditionGw.setPhoneNumber(receivedData.getMsisdn());
-                            smsMisMatchConditionGw.setFrequency(receivedData.getEventData().getEventItem().getOffer().getFrequency());
-                            smsMisMatchConditionGw.setChanel(receivedData.getPublishChannel());
-                            smsMisMatchConditionGw.setOfferingId(receivedData.getEventData().getEventItem().getOffer().getOfferingType());
-                            smsMisMatchConditionGw.setOrderType(receivedData.getOrderType().toUpperCase());
-                            smsMisMatchConditionGw.setServiceType(receivedData.getEventData().getEventItem().getOffer().getServiceType());
-                            smsMisMatchConditionGw.setOrder_type_MainID(orderTypeData.getMainID());
-                            smsMisMatchConditionGw.setIsStatus(2);
-                            smsMisMatchConditionGw.setPayloadMQ(messageMq);
-                            smsMisMatchConditionGw.setCreatedDate(createdDate);
-                            smsGatewayService.createConditionalMessage(smsMisMatchConditionGw);
                         }
+                    }
+
+                    if (isNotMatchCondition){
+                        Instant instant = Instant.now();
+                        Timestamp createdDate = Timestamp.from(instant);
+                        SmsGatewayData smsMisMatchConditionGw = new SmsGatewayData();
+                        smsMisMatchConditionGw.setPhoneNumber(receivedData.getMsisdn());
+                        smsMisMatchConditionGw.setFrequency(receivedData.getEventData().getEventItem().getOffer().getFrequency());
+                        smsMisMatchConditionGw.setChanel(receivedData.getPublishChannel());
+                        smsMisMatchConditionGw.setOfferingId(receivedData.getEventData().getEventItem().getOffer().getOfferingType());
+                        smsMisMatchConditionGw.setOrderType(receivedData.getOrderType().toUpperCase());
+                        smsMisMatchConditionGw.setServiceType(receivedData.getEventData().getEventItem().getOffer().getServiceType());
+                        smsMisMatchConditionGw.setOrder_type_MainID(orderTypeData.getMainID());
+                        smsMisMatchConditionGw.setIsStatus(2);
+                        smsMisMatchConditionGw.setPayloadMQ(messageMq);
+                        smsMisMatchConditionGw.setCreatedDate(createdDate);
+                        smsGatewayService.createConditionalMessage(smsMisMatchConditionGw);
                     }
 
                 }else{
