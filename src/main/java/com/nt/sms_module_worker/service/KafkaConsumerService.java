@@ -104,6 +104,7 @@ public class KafkaConsumerService {
                             smsMatchConditionGw.setPhoneNumber(receivedData.getMsisdn());
                             smsMatchConditionGw.setChanel(receivedData.getPublishChannel());
                             smsMatchConditionGw.setIsStatus(0);
+                            smsMatchConditionGw.setFrequency(receivedData.getEventData().getEventItem().getOffer().getFrequency());
                             smsMatchConditionGw.setOfferingId(receivedData.getEventData().getEventItem().getOffer().getOfferingType());
                             smsMatchConditionGw.setOrderType(receivedData.getOrderType().toUpperCase());
                             smsMatchConditionGw.setServiceType(receivedData.getEventData().getEventItem().getOffer().getServiceType());
