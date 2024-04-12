@@ -38,6 +38,10 @@ public class KafkaConfig {
         properties.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
         properties.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, enableAutoCommitConfig); // close auto commit ack message FALSE
         properties.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, autoOffsetResetConfig);
+        properties.put("security.protocol", "SASL_PLAINTEXT");
+        properties.put("sasl.mechanism", "SCRAM-SHA-256");
+        properties.put("sasl.jaas.config", "org.apache.kafka.common.security.scram.ScramLoginModule required username=\"admin\" password=\"admin-secret\";");
+        
         
         return new DefaultKafkaConsumerFactory<>(properties);
     }
