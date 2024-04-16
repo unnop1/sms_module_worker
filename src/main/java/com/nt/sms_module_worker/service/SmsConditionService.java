@@ -6,7 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -47,14 +47,20 @@ public class SmsConditionService {
 
   public String getQueryOrderTypeSmsCondition(ReceivedData receivedData) {
     // Get the current date
-    String currentDate = LocalDate.now().toString();
+    LocalDateTime currentDate = LocalDateTime.now();
+
+    // Define the desired output format
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMM yyyy HH.mm.ss.SSSSSSSSS");
+
+    // Format the date and time using the formatter
+    String formattedCurrentDate = currentDate.format(formatter);
 
     String tableName = "config_conditions";
 
     String query = "SELECT * FROM "+ tableName +
                   " WHERE ( orderType ='" + receivedData.getOrderType() + "'" + " OR orderType IS NULL )" +
-                  " AND ( dateStart <='" + currentDate + "'" + " OR dateStart IS NULL )" +
-                  " AND ( dateEnd >='" + currentDate + "'" + " OR dateEnd IS NULL )";        
+                  " AND ( date_Start <='" + formattedCurrentDate + "'" + " OR date_Start IS NULL )" +
+                  " AND ( date_End >='" + formattedCurrentDate + "'" + " OR date_End IS NULL )";        
                   
     // System.out.println("query condition : "+query);
     return query;
@@ -73,14 +79,22 @@ public class SmsConditionService {
       try{          
           while (rs.next()) {
               SmsConditionData smsConditionData = new SmsConditionData();
-              smsConditionData.setConditionsID(rs.getLong("conditionsID"));
+              smsConditionData.setConditions_ID(rs.getLong("conditions_ID"));
               smsConditionData.setOrderType(rs.getString("orderType"));
               smsConditionData.setMessage(rs.getString("Message"));
               smsConditionData.setOrder_type_MainID(rs.getLong("order_type_MainID"));
               smsConditionData.setConditions_or(rs.getString("conditions_or"));
               smsConditionData.setConditions_and(rs.getString("conditions_and"));
-              smsConditionData.setDateStart(rs.getDate("DateStart"));
-              smsConditionData.setDateEnd(rs.getDate("DateEnd"));
+              smsConditionData.setDate_Start(rs.getDate("Date_Start"));
+              smsConditionData.setDate_End(rs.getDate("Date_End"));
+              smsConditionData.setCreated_Date(rs.getTimestamp("created_Date"));
+              smsConditionData.setUpdated_Date(rs.getTimestamp("updated_Date"));
+              smsConditionData.setCreated_By(rs.getString("created_By"));
+              smsConditionData.setUpdated_By(rs.getString("updated_By"));
+              smsConditionData.setIs_delete(rs.getInt("is_delete"));
+              smsConditionData.setIs_delete_By(rs.getString("is_delete_By"));
+              smsConditionData.setIs_delete_Date(rs.getTimestamp("is_delete_Date")); //
+              
               conditionDataList.add(smsConditionData);
           }
           

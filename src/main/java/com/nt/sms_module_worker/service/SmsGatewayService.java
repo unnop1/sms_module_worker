@@ -6,6 +6,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -31,16 +32,18 @@ class SmsGatewayService {
     try {
       // Define the SQL INSERT statement
       String insertQuery = "INSERT INTO "+ tableName +
-            " (sms_conditions_SMSID, SMSMessage, order_type_MainID, OrderType, PhoneNumber, serviceType, Frequency, Chanel, PayloadMQ, IsStatus, CreatedDate, OfferingId, remark )" + 
-            " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            " (config_conditions_ID, SMSMessage, order_type_Main_ID, OrderType, PhoneNumber, PayloadMQ, PayloadGW, Is_Status, Created_Date, remark )" + 
+            " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
+        System.out.println(insertQuery);
       // Create a PreparedStatement with the insertQuery
-      statement = con.prepareStatement(insertQuery, Statement.RETURN_GENERATED_KEYS);
+      String returnCols[] = { "GID" };
+      statement = con.prepareStatement(insertQuery, returnCols);
 
       // Set values for the parameters in the prepared statement
       // statement.setLong(1, smsGatewayData.getSms_condition_SMSID()); // Replace value1 with the actual value for column1
-      if (smsGatewayData.getSms_condition_SMSID() != null) {
-        statement.setLong(1, smsGatewayData.getSms_condition_SMSID());
+      if (smsGatewayData.getConfig_conditions_ID() != null) {
+        statement.setLong(1, smsGatewayData.getConfig_conditions_ID());
       } else {
         statement.setNull(1, java.sql.Types.BIGINT);
       }
@@ -51,8 +54,8 @@ class SmsGatewayService {
         statement.setNull(2, java.sql.Types.LONGVARCHAR);
       }
 
-      if (smsGatewayData.getOrder_type_MainID() != null) {
-        statement.setLong(3, smsGatewayData.getOrder_type_MainID());
+      if (smsGatewayData.getOrder_type_Main_ID() != null) {
+        statement.setLong(3, smsGatewayData.getOrder_type_Main_ID());
       }else {
         statement.setNull(3, java.sql.Types.BIGINT);
       }
@@ -68,53 +71,35 @@ class SmsGatewayService {
       }else {
         statement.setNull(5, java.sql.Types.VARCHAR);
       }
-
-      if (smsGatewayData.getServiceType() != null) {
-        statement.setInt(6,smsGatewayData.getServiceType());
+      
+      if (smsGatewayData.getPayloadMQ() != null) {
+        statement.setString(6,smsGatewayData.getPayloadMQ());
       }else {
-        statement.setNull(6, java.sql.Types.INTEGER);
+        statement.setNull(6, java.sql.Types.VARCHAR);
       }
 
-      if (smsGatewayData.getFrequency() != null) {
-        statement.setString(7,smsGatewayData.getFrequency());
+      if (smsGatewayData.getPayloadGW() != null) {
+        statement.setString(7,smsGatewayData.getPayloadGW());
       }else {
         statement.setNull(7, java.sql.Types.VARCHAR);
       }
 
-      if (smsGatewayData.getChanel() != null) {
-        statement.setString(8,smsGatewayData.getChanel());
+      if (smsGatewayData.getIs_Status() != null) {
+        statement.setInt(8,smsGatewayData.getIs_Status());
       }else {
-        statement.setNull(8, java.sql.Types.VARCHAR);
-      }
-      
-      if (smsGatewayData.getPayloadMQ() != null) {
-        statement.setString(9,smsGatewayData.getPayloadMQ());
-      }else {
-        statement.setNull(9, java.sql.Types.VARCHAR);
+        statement.setNull(8, java.sql.Types.INTEGER);
       }
 
-      if (smsGatewayData.getIsStatus() != null) {
-        statement.setInt(10,smsGatewayData.getIsStatus());
+      if (smsGatewayData.getCreated_Date() != null) {
+        statement.setTimestamp(9,smsGatewayData.getCreated_Date());
       }else {
-        statement.setNull(10, java.sql.Types.BOOLEAN);
-      }
-
-      if (smsGatewayData.getCreatedDate() != null) {
-        statement.setTimestamp(11,smsGatewayData.getCreatedDate());
-      }else {
-        statement.setNull(11, java.sql.Types.TIMESTAMP);
-      }
-
-      if (smsGatewayData.getOfferingId() != null) {
-        statement.setString(12,smsGatewayData.getOfferingId());
-      }else {
-        statement.setNull(12, java.sql.Types.VARCHAR);
+        statement.setNull(9, java.sql.Types.TIMESTAMP);
       }
 
       if (smsGatewayData.getRemark() != null) {
-        statement.setString(13,smsGatewayData.getRemark());
+        statement.setString(10,smsGatewayData.getRemark());
       }else {
-        statement.setNull(13, java.sql.Types.VARCHAR);
+        statement.setNull(10, java.sql.Types.VARCHAR);
       }
       
       // Execute the insert operation

@@ -24,7 +24,6 @@ public class OrderTypeService {
     public List<OrderTypeData> getListOrderType() throws SQLException {
       // String query = "SELECT * FROM conditions";
       List<OrderTypeData> orderTypeDataList = new ArrayList<>();
-      String databaseName = "admin_red_sms";
       String tableName = "order_type";
       Connection con = jbdcDB.getConnection();
       String query = "SELECT * FROM "+ tableName;
@@ -37,13 +36,13 @@ public class OrderTypeService {
                 OrderTypeData orderTypeData = new OrderTypeData();
                 orderTypeData.setTYPEID(rs.getLong("TYPEID"));
                 orderTypeData.setMainID(rs.getLong("MainID"));
-                orderTypeData.setOrderTypeName(rs.getString("OrderTypeName"));
-                orderTypeData.setIsDelete(rs.getBoolean("IsDelete"));
-                orderTypeData.setIsEnable(rs.getBoolean("IsEnable"));
-                orderTypeData.setCreatedDate(rs.getTimestamp("CreatedDate"));
-                orderTypeData.setUpdatedDate(rs.getTimestamp("UpdatedDate"));
-                orderTypeData.setCreatedBy_UserID(rs.getLong("CreatedBy_UserID"));
-                orderTypeData.setUpdatedBy_UserID(rs.getLong("UpdatedBy_UserID"));
+                orderTypeData.setOrderType_Name(rs.getString("OrderType_Name"));
+                orderTypeData.setIs_Delete(rs.getBoolean("Is_Delete"));
+                orderTypeData.setIs_Enable(rs.getBoolean("Is_Enable"));
+                orderTypeData.setCreated_Date(rs.getTimestamp("Created_Date"));
+                orderTypeData.setUpdated_Date(rs.getTimestamp("Updated_Date"));
+                orderTypeData.setCreated_By(rs.getLong("Created_By"));
+                orderTypeData.setUpdated_By(rs.getLong("Updated_By"));
                 orderTypeDataList.add(orderTypeData);
           }
           
@@ -72,8 +71,8 @@ public class OrderTypeService {
     public String getQueryOrderTypeAvailable(ReceivedData receivedData) {
         String tableName = "order_type";
         String query = "SELECT * FROM "+ tableName +
-                    " WHERE OrderTypeName='" + receivedData.getOrderType() + "'" +
-                    " AND IsDelete=0" ;
+                    " WHERE OrderType_Name='" + receivedData.getOrderType() + "'" +
+                    " AND Is_Delete=0" ;
 
         // System.out.println("query ordertype : "+query);
         return query;
@@ -95,13 +94,13 @@ public class OrderTypeService {
                 // Retrieve data from the first row
                 orderTypeData.setTYPEID(rs.getLong("TYPEID"));
                 orderTypeData.setMainID(rs.getLong("MainID"));
-                orderTypeData.setOrderTypeName(rs.getString("OrderTypeName"));
-                orderTypeData.setIsDelete(rs.getBoolean("IsDelete"));
-                orderTypeData.setIsEnable(rs.getBoolean("IsEnable"));
-                orderTypeData.setCreatedDate(rs.getTimestamp("CreatedDate"));
-                orderTypeData.setUpdatedDate(rs.getTimestamp("UpdatedDate"));
-                orderTypeData.setCreatedBy_UserID(rs.getLong("CreatedBy_UserID"));
-                orderTypeData.setUpdatedBy_UserID(rs.getLong("UpdatedBy_UserID"));
+                orderTypeData.setOrderType_Name(rs.getString("OrderType_Name"));
+                orderTypeData.setIs_Delete(rs.getBoolean("Is_Delete"));
+                orderTypeData.setIs_Enable(rs.getBoolean("Is_Enable"));
+                orderTypeData.setCreated_Date(rs.getTimestamp("Created_Date"));
+                orderTypeData.setUpdated_Date(rs.getTimestamp("Updated_Date"));
+                orderTypeData.setCreated_By(rs.getLong("Created_By"));
+                orderTypeData.setUpdated_By(rs.getLong("Updated_By"));
 
             } 
             

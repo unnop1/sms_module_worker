@@ -15,18 +15,15 @@ import net.sf.jsqlparser.expression.DateTimeLiteralExpression.DateTime;
 @ToString
 public class SmsGatewayData {
     private Long GID = null;
-    private Long sms_condition_SMSID = null;
+    private Long config_conditions_ID = null;
     private String SMSMessage= null;
-    private Long order_type_MainID = null;
+    private String Message_Raw= null;
+    private Long order_type_Main_ID = null;
     private String OrderType = null;
     private String PhoneNumber = null;
-    private Integer serviceType = null;
-    private String Frequency = null;
-    private String Chanel = null;
-    private String OfferingId = null;
     private String PayloadMQ = null;
     private String PayloadGW = null;
-    private Integer IsStatus = 0;
+    private Integer Is_Status = 0;
     private String remark = null;
-    private Timestamp CreatedDate = null;
+    private Timestamp Created_Date = null;
 }

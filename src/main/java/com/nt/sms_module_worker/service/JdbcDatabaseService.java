@@ -47,7 +47,7 @@ public class JdbcDatabaseService {
         config.setMaxLifetime(1800000); // Maximum lifetime of a connection in the pool
 
         // Add a connection test query to check if the connection is still valid
-        config.setConnectionTestQuery("SELECT 1");
+        config.setConnectionTestQuery("SELECT 1 FROM dual");
 
         // Add other necessary configurations here
 
