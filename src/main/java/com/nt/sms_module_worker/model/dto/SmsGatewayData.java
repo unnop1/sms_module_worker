@@ -18,7 +18,7 @@ public class SmsGatewayData {
     private Long config_conditions_ID = null;
     private String SMSMessage= null;
     private String Message_Raw= null;
-    private Long order_type_Main_ID = null;
+    private Long order_type_MainID = null;
     private String OrderType = null;
     private String PhoneNumber = null;
     private String PayloadMQ = null;
@@ -26,4 +26,7 @@ public class SmsGatewayData {
     private Integer Is_Status = 0;
     private String remark = null;
     private Timestamp Created_Date = null;
+    private Timestamp receive_date = null;
+    private Timestamp send_Date = null;
+    private String transaction_id = null;
 }

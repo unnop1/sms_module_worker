@@ -32,16 +32,13 @@ class SmsGatewayService {
     try {
       // Define the SQL INSERT statement
       String insertQuery = "INSERT INTO "+ tableName +
-            " (config_conditions_ID, SMSMessage, order_type_Main_ID, OrderType, PhoneNumber, PayloadMQ, PayloadGW, Is_Status, Created_Date, remark )" + 
-            " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            " (config_conditions_ID, SMSMessage, order_type_MainID, OrderType, PhoneNumber, PayloadMQ, PayloadGW, Is_Status, Created_Date, remark, MESSAGE_RAW, RECEIVE_DATE, SEND_DATE, TRANSACTION_ID )" + 
+            " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-        System.out.println(insertQuery);
       // Create a PreparedStatement with the insertQuery
       String returnCols[] = { "GID" };
       statement = con.prepareStatement(insertQuery, returnCols);
 
-      // Set values for the parameters in the prepared statement
-      // statement.setLong(1, smsGatewayData.getSms_condition_SMSID()); // Replace value1 with the actual value for column1
       if (smsGatewayData.getConfig_conditions_ID() != null) {
         statement.setLong(1, smsGatewayData.getConfig_conditions_ID());
       } else {
@@ -54,8 +51,8 @@ class SmsGatewayService {
         statement.setNull(2, java.sql.Types.LONGVARCHAR);
       }
 
-      if (smsGatewayData.getOrder_type_Main_ID() != null) {
-        statement.setLong(3, smsGatewayData.getOrder_type_Main_ID());
+      if (smsGatewayData.getOrder_type_MainID() != null) {
+        statement.setLong(3, smsGatewayData.getOrder_type_MainID());
       }else {
         statement.setNull(3, java.sql.Types.BIGINT);
       }
@@ -101,6 +98,30 @@ class SmsGatewayService {
       }else {
         statement.setNull(10, java.sql.Types.VARCHAR);
       }
+
+      if (smsGatewayData.getMessage_Raw() != null) {
+        statement.setString(11,smsGatewayData.getMessage_Raw());
+      }else {
+        statement.setNull(11, java.sql.Types.VARCHAR);
+      }
+
+      if (smsGatewayData.getReceive_date() != null) {
+        statement.setTimestamp(12,smsGatewayData.getReceive_date());
+      }else {
+        statement.setNull(12, java.sql.Types.TIMESTAMP);
+      }
+
+      if (smsGatewayData.getSend_Date() != null) {
+        statement.setTimestamp(13,smsGatewayData.getSend_Date());
+      }else {
+        statement.setNull(13, java.sql.Types.TIMESTAMP);
+      }
+
+      if (smsGatewayData.getTransaction_id() != null) {
+        statement.setString(14,smsGatewayData.getTransaction_id());
+      }else {
+        statement.setNull(14, java.sql.Types.VARCHAR);
+      }
       
       // Execute the insert operation
       int rowsInserted = statement.executeUpdate();
@@ -118,7 +139,7 @@ class SmsGatewayService {
       }
         
     } catch (SQLException e) {
-        System.out.println("Error: " + e.getMessage());
+        System.out.println("Error createConditionalMessage: " + e.getMessage());
     } finally {
       // Step 4: Close Connection
       try {
@@ -169,7 +190,7 @@ class SmsGatewayService {
         int rowsUpdated = statement.executeUpdate();
         // System.out.println("Rows updated: " + rowsUpdated);
     } catch (SQLException e) {
-        System.out.println("Error: " + e.getMessage());
+        System.out.println("Error updateConditionalMessageById: " + e.getMessage());
     } finally {
         // Close resources
         try {

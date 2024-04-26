@@ -48,7 +48,7 @@ public class OrderTypeService {
           
 
       } catch (SQLException e) {
-          System.out.println("Error: " + e.getMessage());
+          System.out.println(" " + e.getMessage());
       } finally {
         // Step 4: Close Connection
         try {
@@ -106,7 +106,7 @@ public class OrderTypeService {
             
   
         } catch (SQLException e) {
-            System.out.println("Error: " + e.getMessage());
+            System.out.println("Error getOrderType: " + e.getMessage());
             
         }
         return orderTypeData;

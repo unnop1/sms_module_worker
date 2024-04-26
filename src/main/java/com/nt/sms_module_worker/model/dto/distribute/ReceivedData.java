@@ -8,6 +8,8 @@ import lombok.Setter;
 @Getter
 @Setter
 public class ReceivedData {
+    @JsonProperty("triggerDate")
+    private String triggerDate;
     @JsonProperty("orderType")
     private String orderType;
     @JsonProperty("msisdn")
@@ -15,5 +17,5 @@ public class ReceivedData {
     @JsonProperty("publishChannel")
     private String publishChannel;
     @JsonProperty("eventData")
-    private EventData eventData;
+    private Object eventData;
 }

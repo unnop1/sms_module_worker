@@ -99,7 +99,7 @@ public class SmsConditionService {
           }
           
       } catch (SQLException e) {
-          System.out.println("Error: " + e.getMessage());
+          System.out.println("Error getListSmsCondition: " + e.getMessage());
           
       } finally {
         // Step 4: Close Connection
