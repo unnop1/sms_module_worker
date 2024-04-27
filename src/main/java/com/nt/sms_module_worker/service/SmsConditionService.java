@@ -124,26 +124,32 @@ public class SmsConditionService {
   public boolean checkSendSms(SmsConditionData smsCondition , JSONObject jsonData) throws JsonMappingException, JsonProcessingException {
     // System.out.println("smsCondition.getConditions_or:"+smsCondition.getConditions_or());
     // System.out.println("smsCondition.getConditions_and:"+smsCondition.getConditions_and());
-
-    JSONArray jsonSmsOrCon = new JSONArray(smsCondition.getConditions_or());
-    JSONArray jsonSmsAndCon = new JSONArray(smsCondition.getConditions_and());
-    
-    for (int i = 0; i < jsonSmsAndCon.length(); i++) {
-        JSONObject conf = jsonSmsAndCon.getJSONObject(i);
-        if (!checkAndCondition(conf, jsonData)){
-            return false;
+    try{
+        if((smsCondition.getConditions_or()!= null) || (smsCondition.getConditions_and() != null)){
+            JSONArray jsonSmsOrCon = new JSONArray(smsCondition.getConditions_or());
+            JSONArray jsonSmsAndCon = new JSONArray(smsCondition.getConditions_and());
+            
+            for (int i = 0; i < jsonSmsAndCon.length(); i++) {
+                JSONObject conf = jsonSmsAndCon.getJSONObject(i);
+                if (!checkAndCondition(conf, jsonData)){
+                    return false;
+                }
+            }
+            
+            for (int i = 0; i < jsonSmsOrCon.length(); i++) {
+                JSONObject conf = jsonSmsOrCon.getJSONObject(i);
+                if (!checkOrCondition(conf, jsonData)){ 
+                    return false;
+                }
+            }
         }
-    }
-    
-    for (int i = 0; i < jsonSmsOrCon.length(); i++) {
-        JSONObject conf = jsonSmsOrCon.getJSONObject(i);
-        if (!checkOrCondition(conf, jsonData)){ 
-            return false;
-        }
-    }
 
-    
-    return true;    
+        
+        return true;    
+    }catch(Exception e){
+        System.out.println("error checking condition: " + e.getMessage());
+        return false;
+    }
   }
   public String checkFieldType(JSONObject jObj, String fieldName) {
     if (!jObj.has(fieldName)){

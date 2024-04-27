@@ -1,12 +1,9 @@
 package com.nt.sms_module_worker.service;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -23,6 +20,42 @@ class SmsGatewayService {
   private JdbcDatabaseService jbdcDB;
 
   public SmsGatewayService() {}
+
+  public Integer countAllToday() throws SQLException {
+    PreparedStatement statement = null;
+    String tableName = "sms_gateway";
+    Connection con = jbdcDB.getConnection();
+    try {
+
+      String query = "SELECT COUNT(*) FROM " + tableName + " WHERE TRUNC(created_date) = TRUNC(sysdate)";
+      statement = con.prepareStatement(query);
+      
+      ResultSet rs = statement.executeQuery();
+      
+      Integer count = null;
+      if (rs.next()) {
+          count = rs.getInt(1);
+      }
+      // System.out.println("query: " + query);
+      // System.out.println("count: " + count);
+      return count;
+
+    } catch (SQLException e) {
+      System.out.println("Error countAll: " + e.getMessage());
+    } finally {
+      try {
+          if (statement != null) {
+            statement.close();
+          }
+          if (con != null) {
+              con.close();
+          }
+      } catch (SQLException e) {
+          e.printStackTrace();
+      }
+    }
+    return 0;
+  }
 
   public SmsGatewayData createConditionalMessage(SmsGatewayData smsGatewayData) throws SQLException {
     PreparedStatement statement = null;
@@ -141,7 +174,6 @@ class SmsGatewayService {
     } catch (SQLException e) {
         System.out.println("Error createConditionalMessage: " + e.getMessage());
     } finally {
-      // Step 4: Close Connection
       try {
           if (statement != null) {
             statement.close();
@@ -170,11 +202,13 @@ class SmsGatewayService {
             if (updateQuery.length() > 23) {
                 updateQuery.append(", ");
             }
-            updateQuery.append(entry.getKey()).append(" = ").append(entry.getValue());
+            updateQuery.append(entry.getKey()).append(" = ?");
+            values.add(entry.getValue()); // Add the parameter value
         }
 
         // Add the WHERE clause for the sms_conditions_SMSID
-        updateQuery.append(" WHERE GID=").append(smsGatewayId);
+        updateQuery.append(" WHERE GID=?");
+        values.add(smsGatewayId); // Add the parameter value
 
         // Prepare the statement
         statement = con.prepareStatement(updateQuery.toString());

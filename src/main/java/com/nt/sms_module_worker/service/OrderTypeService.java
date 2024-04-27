@@ -71,7 +71,7 @@ public class OrderTypeService {
     public String getQueryOrderTypeAvailable(ReceivedData receivedData) {
         String tableName = "order_type";
         String query = "SELECT * FROM "+ tableName +
-                    " WHERE OrderType_Name='" + receivedData.getOrderType() + "'" +
+                    " WHERE OrderType_Name='" + receivedData.getOrderType().toUpperCase() + "'" +
                     " AND Is_Delete=0" ;
 
         // System.out.println("query ordertype : "+query);
