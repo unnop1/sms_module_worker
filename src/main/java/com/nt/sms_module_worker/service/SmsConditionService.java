@@ -58,9 +58,10 @@ public class SmsConditionService {
     String tableName = "config_conditions";
 
     String query = "SELECT * FROM "+ tableName +
-                  " WHERE ( orderType ='" + receivedData.getOrderType() + "'" + " OR orderType IS NULL )" +
+                  " WHERE is_enable = 1"+
+                  " AND ( orderType ='" + receivedData.getOrderType() + "'" + " OR orderType IS NULL )" +
                   " AND ( date_Start <='" + formattedCurrentDate + "'" + " OR date_Start IS NULL )" +
-                  " AND ( date_End >='" + formattedCurrentDate + "'" + " OR date_End IS NULL )";        
+                  " AND ( date_End >='" + formattedCurrentDate + "'" + " OR date_End IS NULL )";      
                   
     // System.out.println("query condition : "+query);
     return query;
