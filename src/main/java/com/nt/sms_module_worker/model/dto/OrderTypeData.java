@@ -14,7 +14,7 @@ public class OrderTypeData {
     private Boolean Is_Enable = false;
     private Boolean Is_Delete = false;
     private Timestamp Created_Date = null;
-    private Long Created_By = null;
+    private String Created_By = null;
     private Timestamp Updated_Date = null ;
-    private Long Updated_By = null;
+    private String Updated_By = null;
 }

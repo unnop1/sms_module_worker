@@ -125,9 +125,8 @@ public class SmsConditionService {
   public boolean checkSendSms(SmsConditionData smsCondition , JSONObject jsonData) throws JsonMappingException, JsonProcessingException {
     // System.out.println("smsCondition.getConditions_or:"+smsCondition.getConditions_or());
     // System.out.println("smsCondition.getConditions_and:"+smsCondition.getConditions_and());
-    try{
-        if((smsCondition.getConditions_or()!= null) || (smsCondition.getConditions_and() != null)){
-            JSONArray jsonSmsOrCon = new JSONArray(smsCondition.getConditions_or());
+    // try{
+        if(smsCondition.getConditions_and() != null){
             JSONArray jsonSmsAndCon = new JSONArray(smsCondition.getConditions_and());
             
             for (int i = 0; i < jsonSmsAndCon.length(); i++) {
@@ -136,6 +135,10 @@ public class SmsConditionService {
                     return false;
                 }
             }
+        }
+
+        if(smsCondition.getConditions_or()!= null){
+            JSONArray jsonSmsOrCon = new JSONArray(smsCondition.getConditions_or());
             
             for (int i = 0; i < jsonSmsOrCon.length(); i++) {
                 JSONObject conf = jsonSmsOrCon.getJSONObject(i);
@@ -147,10 +150,10 @@ public class SmsConditionService {
 
         
         return true;    
-    }catch(Exception e){
-        System.out.println("error checking condition: " + e.getMessage());
-        return false;
-    }
+    // }catch(Exception e){
+    //     System.out.println("error checking condition: " + e.getMessage());
+    //     return false;
+    // }
   }
   public String checkFieldType(JSONObject jObj, String fieldName) {
     if (!jObj.has(fieldName)){
@@ -196,6 +199,8 @@ public boolean doStringOperation(String operator,String dataValue, String orConf
             return !(dataValue.equals(orConfValue));
         case "=":
             return dataValue.equals(orConfValue);
+        case "like":
+            return dataValue.contains(orConfValue);
         default:
             return true;
     }
@@ -245,7 +250,7 @@ public boolean doCondition(JSONObject jsonData, String conditionKey, JSONObject 
     // check condition
     String configValueType = checkFieldType(orValueConfig, "value");
     // System.out.println("checkFieldType:"+configValueType);
-    String operation_type = orValueConfig.getString("operation_type");
+    String operation_type = orValueConfig.getString("operation_type").toLowerCase();
     // System.out.println("operation_type:"+operation_type);
     switch (configValueType) {
         case "Integer":
@@ -276,21 +281,38 @@ public boolean checkOrCondition(JSONObject orConf, JSONObject jsonData){
     for (String conditionKey : orConf.keySet()){
         String orConfType = checkFieldType(orConf, conditionKey);
         String dataType = checkFieldType(jsonData, conditionKey);
-        // System.out.println(conditionKey+ " have conf type "+ orConfType +" and data type "+ dataType);
+        System.out.println(conditionKey+ " have conf type "+ orConfType +" and data type "+ dataType);
         if(orConfType == "ValueConfig"){
             // String dataValue = jsonData.getString(key);
             JSONObject orValueConfig = orConf.getJSONObject(conditionKey);
             // String operation_type = orConfValue.getString("operation_type");
             isMatchCondition = doCondition(jsonData, conditionKey, orValueConfig);
-            // System.out.println(conditionKey+ " have conf type "+ orConfType +" and data type "+ dataType + ", isNoCondition is "+isNoCondition);
+            System.out.println(conditionKey+ " have conf type "+ orConfType +" and data type "+ dataType );
             if (isMatchCondition){
                 return true;
             }
         }else{
             // Sub Object
-            isMatchCondition = checkOrCondition(orConf.getJSONObject(conditionKey), jsonData.getJSONObject(conditionKey));
-            if (isMatchCondition){
-                return true;
+            String subConfType = checkFieldType(jsonData, conditionKey);
+            if (subConfType == "JSONArray"){
+                JSONArray jsonArray = jsonData.getJSONArray(conditionKey);
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    JSONObject dataJson = jsonArray.getJSONObject(i);
+                    JSONObject orConditionFound = orConf.optJSONObject(conditionKey);
+                    JSONObject dataJsonFound = dataJson.optJSONObject(conditionKey);
+                    if(orConditionFound == null || dataJsonFound == null){
+                        continue;
+                    }
+                    isMatchCondition = checkOrCondition(orConf.getJSONObject(conditionKey), dataJson.getJSONObject(conditionKey));
+                    if (isMatchCondition){
+                        return true;
+                    }
+                }
+            }else{
+                isMatchCondition = checkOrCondition(orConf.getJSONObject(conditionKey), jsonData.getJSONObject(conditionKey));
+                if (isMatchCondition){
+                    return true;
+                }
             }
         }
     }
@@ -317,10 +339,29 @@ public boolean checkAndCondition(JSONObject andConf, JSONObject jsonData){
             }
         }else{
             // Sub Object
-            isMatchCondition = checkAndCondition(andConf.getJSONObject(conditionKey), jsonData.getJSONObject(conditionKey));
-            if (!isMatchCondition){
-                return false;
+            String subConfType = checkFieldType(jsonData, conditionKey);
+            if (subConfType == "JSONArray"){
+                JSONArray jsonArray = jsonData.getJSONArray(conditionKey);
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    JSONObject dataJson = jsonArray.getJSONObject(i);
+                    JSONObject andConditionFound = andConf.optJSONObject(conditionKey);
+                    JSONObject dataJsonFound = dataJson.optJSONObject(conditionKey);
+                    if(andConditionFound == null || dataJsonFound == null){
+                        continue;
+                    }
+                    isMatchCondition = checkAndCondition(andConf.getJSONObject(conditionKey), dataJson.getJSONObject(conditionKey));
+                    if (!isMatchCondition){
+                        return false;
+                    }
+                }
+            }else{
+                isMatchCondition = checkAndCondition(andConf.getJSONObject(conditionKey), jsonData.getJSONObject(conditionKey));
+                if (!isMatchCondition){
+                    return false;
+                }
             }
+
+            
         }
     }
 

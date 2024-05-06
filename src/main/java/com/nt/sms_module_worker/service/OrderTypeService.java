@@ -41,8 +41,8 @@ public class OrderTypeService {
                 orderTypeData.setIs_Enable(rs.getBoolean("Is_Enable"));
                 orderTypeData.setCreated_Date(rs.getTimestamp("Created_Date"));
                 orderTypeData.setUpdated_Date(rs.getTimestamp("Updated_Date"));
-                orderTypeData.setCreated_By(rs.getLong("Created_By"));
-                orderTypeData.setUpdated_By(rs.getLong("Updated_By"));
+                orderTypeData.setCreated_By(rs.getString("Created_By"));
+                orderTypeData.setUpdated_By(rs.getString("Updated_By"));
                 orderTypeDataList.add(orderTypeData);
           }
           
@@ -99,8 +99,8 @@ public class OrderTypeService {
                 orderTypeData.setIs_Enable(rs.getBoolean("Is_Enable"));
                 orderTypeData.setCreated_Date(rs.getTimestamp("Created_Date"));
                 orderTypeData.setUpdated_Date(rs.getTimestamp("Updated_Date"));
-                orderTypeData.setCreated_By(rs.getLong("Created_By"));
-                orderTypeData.setUpdated_By(rs.getLong("Updated_By"));
+                orderTypeData.setCreated_By(rs.getString("Created_By"));
+                orderTypeData.setUpdated_By(rs.getString("Updated_By"));
 
             } 
             
