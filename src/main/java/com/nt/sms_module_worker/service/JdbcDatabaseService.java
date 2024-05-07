@@ -26,8 +26,28 @@ public class JdbcDatabaseService {
 
     private static HikariDataSource dataSource;
 
-    public static Connection getConnection() throws SQLException {
+    private static final int CONNECTION_TIMEOUT_MS = 30000;
+
+    private static volatile Connection connection;
+    
+
+    public static synchronized Connection getConnection() throws SQLException {
+        if (connection == null || !isConnectionValid(connection)) {
+            connection = createNewConnection();
+        }
+        return connection;
+    }
+
+    private static Connection createNewConnection() throws SQLException {
         return dataSource.getConnection();
+    }
+
+    private static boolean isConnectionValid(Connection connection) {
+        try {
+            return connection.isValid(CONNECTION_TIMEOUT_MS); // Check if the connection is still valid
+        } catch (SQLException e) {
+            return false;
+        }
     }
 
     public JdbcDatabaseService(@Value("${spring.datasource.url}") String jdbcUrl,
