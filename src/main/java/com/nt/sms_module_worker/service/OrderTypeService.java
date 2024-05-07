@@ -85,10 +85,9 @@ public class OrderTypeService {
         Connection con = jbdcDB.getConnection();
   
         OrderTypeData orderTypeData = new OrderTypeData();
+        PreparedStatement statement = con.prepareStatement(query);
+        ResultSet rs = statement.executeQuery();
         try{
-            PreparedStatement statement = con.prepareStatement(query);
-            ResultSet rs = statement.executeQuery();
-  
             
             if (rs.next()) {
                 // Retrieve data from the first row
@@ -108,6 +107,20 @@ public class OrderTypeService {
         } catch (SQLException e) {
             System.out.println("Error getOrderType: " + e.getMessage());
             
+        } finally {
+            try {
+                if (rs != null) {
+                    rs.close();
+                }
+                if (statement != null) {
+                    statement.close();
+                }
+                if (con != null) {
+                    con.close();
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
         return orderTypeData;
       }
