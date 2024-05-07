@@ -5,15 +5,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Arrays;
-
 import org.json.JSONArray;
 import org.json.JSONObject;
-import java.util.Date;
 import java.util.List;
 
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -24,17 +18,11 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 // import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nt.sms_module_worker.model.dto.SmsConditionData;
-import com.nt.sms_module_worker.model.dto.config_conditions.ConfigCondition;
 import com.nt.sms_module_worker.model.dto.distribute.ReceivedData;
 import com.nt.sms_module_worker.util.DateTime;
 
-import ch.qos.logback.classic.pattern.Util;
-
 @Component
 public class SmsConditionService {
-
-  @Autowired
-  private JdbcDatabaseService jbdcDB;
 
   private final RabbitTemplate rabbitTemplate;
 
@@ -65,63 +53,46 @@ public class SmsConditionService {
   }
 
   public List<SmsConditionData> getListSmsCondition(String query) throws SQLException {
-      // String query = "SELECT * FROM conditions";
-      List<SmsConditionData> conditionDataList = new ArrayList<>();
-      String databaseName = "admin_red_sms";
-      Connection con = jbdcDB.getConnection();
+    List<SmsConditionData> conditionDataList = new ArrayList<>();
 
-      PreparedStatement statement = con.prepareStatement(query);
-      ResultSet rs = statement.executeQuery();
-
-      try{          
-          while (rs.next()) {
-              SmsConditionData smsConditionData = new SmsConditionData();
-              smsConditionData.setConditions_ID(rs.getLong("conditions_ID"));
-              smsConditionData.setOrderType(rs.getString("orderType"));
-              smsConditionData.setMessage(rs.getString("Message"));
-              smsConditionData.setOrder_type_MainID(rs.getLong("order_type_MainID"));
-              smsConditionData.setConditions_or(rs.getString("conditions_or"));
-              smsConditionData.setConditions_and(rs.getString("conditions_and"));
-              smsConditionData.setDate_Start(rs.getDate("Date_Start"));
-              smsConditionData.setDate_End(rs.getDate("Date_End"));
-              smsConditionData.setCreated_Date(rs.getTimestamp("created_Date"));
-              smsConditionData.setUpdated_Date(rs.getTimestamp("updated_Date"));
-              smsConditionData.setCreated_By(rs.getString("created_By"));
-              smsConditionData.setUpdated_By(rs.getString("updated_By"));
-              smsConditionData.setIs_delete(rs.getInt("is_delete"));
-              smsConditionData.setIs_delete_By(rs.getString("is_delete_By"));
-              smsConditionData.setIs_delete_Date(rs.getTimestamp("is_delete_Date")); //
-              
-              conditionDataList.add(smsConditionData);
-          }
-          
-      } catch (SQLException e) {
-          System.out.println("Error getListSmsCondition: " + e.getMessage());
-          
-      } finally {
-        // Step 4: Close Connection
-        try {
-            if (rs != null) {
-                rs.close();
-            }
-            if (statement != null) {
-              statement.close();
-            }
-            if (con != null) {
-                con.close();
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
+    try (
+        Connection con = JdbcDatabaseService.getConnection();
+        PreparedStatement statement = con.prepareStatement(query);
+        ResultSet rs = statement.executeQuery()
+    ) {
+        while (rs.next()) {
+            SmsConditionData smsConditionData = new SmsConditionData();
+            smsConditionData.setConditions_ID(rs.getLong("conditions_ID"));
+            smsConditionData.setOrderType(rs.getString("orderType"));
+            smsConditionData.setMessage(rs.getString("Message"));
+            smsConditionData.setOrder_type_MainID(rs.getLong("order_type_MainID"));
+            smsConditionData.setConditions_or(rs.getString("conditions_or"));
+            smsConditionData.setConditions_and(rs.getString("conditions_and"));
+            smsConditionData.setDate_Start(rs.getDate("Date_Start"));
+            smsConditionData.setDate_End(rs.getDate("Date_End"));
+            smsConditionData.setCreated_Date(rs.getTimestamp("created_Date"));
+            smsConditionData.setUpdated_Date(rs.getTimestamp("updated_Date"));
+            smsConditionData.setCreated_By(rs.getString("created_By"));
+            smsConditionData.setUpdated_By(rs.getString("updated_By"));
+            smsConditionData.setIs_delete(rs.getInt("is_delete"));
+            smsConditionData.setIs_delete_By(rs.getString("is_delete_By"));
+            smsConditionData.setIs_delete_Date(rs.getTimestamp("is_delete_Date"));
+            
+            conditionDataList.add(smsConditionData);
         }
-      }
-      return conditionDataList;
-  }
+    } catch (SQLException e) {
+        System.out.println("Error getListSmsCondition: " + e.getMessage());
+        throw e; // Rethrow the exception to propagate it
+    }
+
+    return conditionDataList;
+}
 
 
   public boolean checkSendSms(SmsConditionData smsCondition , JSONObject jsonData) throws JsonMappingException, JsonProcessingException {
     // System.out.println("smsCondition.getConditions_or:"+smsCondition.getConditions_or());
     // System.out.println("smsCondition.getConditions_and:"+smsCondition.getConditions_and());
-    // try{
+    try{
         if(smsCondition.getConditions_and() != null){
             JSONArray jsonSmsAndCon = new JSONArray(smsCondition.getConditions_and());
             
@@ -146,11 +117,13 @@ public class SmsConditionService {
 
         
         return true;    
-    // }catch(Exception e){
-    //     System.out.println("error checking condition: " + e.getMessage());
-    //     return false;
-    // }
+    }catch(Exception e){
+        System.out.println("error checking condition: " + e.getMessage());
+        return false;
+    }
   }
+
+
   public String checkFieldType(JSONObject jObj, String fieldName) {
     if (!jObj.has(fieldName)){
         return "NotFound";

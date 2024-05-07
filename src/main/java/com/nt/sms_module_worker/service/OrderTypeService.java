@@ -16,23 +16,18 @@ import com.nt.sms_module_worker.model.dto.distribute.ReceivedData;
 
 @Component
 public class OrderTypeService {
-    @Autowired
-    private JdbcDatabaseService jbdcDB;
-
-    public OrderTypeService() {}
 
     public List<OrderTypeData> getListOrderType() throws SQLException {
-      // String query = "SELECT * FROM conditions";
-      List<OrderTypeData> orderTypeDataList = new ArrayList<>();
-      String tableName = "order_type";
-      Connection con = jbdcDB.getConnection();
-      String query = "SELECT * FROM "+ tableName;
-      PreparedStatement statement = con.prepareStatement(query);
-      ResultSet rs = statement.executeQuery();
-
-      try{
-          
-          while (rs.next()) {
+        List<OrderTypeData> orderTypeDataList = new ArrayList<>();
+        String tableName = "order_type";
+        String query = "SELECT * FROM " + tableName;
+    
+        try (
+            Connection con = JdbcDatabaseService.getConnection();
+            PreparedStatement statement = con.prepareStatement(query);
+            ResultSet rs = statement.executeQuery()
+        ) {
+            while (rs.next()) {
                 OrderTypeData orderTypeData = new OrderTypeData();
                 orderTypeData.setTYPEID(rs.getLong("TYPEID"));
                 orderTypeData.setMainID(rs.getLong("MainID"));
@@ -44,28 +39,13 @@ public class OrderTypeService {
                 orderTypeData.setCreated_By(rs.getString("Created_By"));
                 orderTypeData.setUpdated_By(rs.getString("Updated_By"));
                 orderTypeDataList.add(orderTypeData);
-          }
-          
-
-      } catch (SQLException e) {
-          System.out.println(" " + e.getMessage());
-      } finally {
-        // Step 4: Close Connection
-        try {
-            if (rs != null) {
-                rs.close();
-            }
-            if (statement != null) {
-              statement.close();
-            }
-            if (con != null) {
-                con.close();
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.out.println("Error getListOrderType: " + e.getMessage());
+            throw e; // Rethrow the exception to propagate it
         }
-      }
-      return orderTypeDataList;
+    
+        return orderTypeDataList;
     }
 
     public String getQueryOrderTypeAvailable(ReceivedData receivedData) {
@@ -80,17 +60,13 @@ public class OrderTypeService {
     }
 
     public OrderTypeData getOrderType(String query) throws SQLException {
-        // String query = "SELECT * FROM conditions";
-        String databaseName = "admin_red_sms";
-        Connection con = jbdcDB.getConnection();
-  
         OrderTypeData orderTypeData = new OrderTypeData();
-        PreparedStatement statement = con.prepareStatement(query);
-        ResultSet rs = statement.executeQuery();
-        try{
-            
+    
+        try (Connection con = JdbcDatabaseService.getConnection();
+             PreparedStatement statement = con.prepareStatement(query);
+             ResultSet rs = statement.executeQuery()) {
+    
             if (rs.next()) {
-                // Retrieve data from the first row
                 orderTypeData.setTYPEID(rs.getLong("TYPEID"));
                 orderTypeData.setMainID(rs.getLong("MainID"));
                 orderTypeData.setOrderType_Name(rs.getString("OrderType_Name"));
@@ -100,28 +76,15 @@ public class OrderTypeService {
                 orderTypeData.setUpdated_Date(rs.getTimestamp("Updated_Date"));
                 orderTypeData.setCreated_By(rs.getString("Created_By"));
                 orderTypeData.setUpdated_By(rs.getString("Updated_By"));
-
-            } 
-            
-  
-        } catch (SQLException e) {
-            System.out.println("Error getOrderType: " + e.getMessage());
-            
-        } finally {
-            try {
-                if (rs != null) {
-                    rs.close();
-                }
-                if (statement != null) {
-                    statement.close();
-                }
-                if (con != null) {
-                    con.close();
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
             }
+    
+        } catch (SQLException e) {
+            // Log or handle the exception appropriately
+            System.out.println("Error getOrderType: " + e.getMessage());
+            throw e; // Rethrow the exception or handle it as per your requirement
         }
+    
         return orderTypeData;
-      }
+    }
+    
 }

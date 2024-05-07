@@ -26,25 +26,36 @@ public class JdbcDatabaseService {
 
     private static HikariDataSource dataSource;
 
-    private static final int CONNECTION_TIMEOUT_MS = 30000;
-
-    private static volatile Connection connection;
+    private static final int CONNECTION_TIMEOUT_MS = 30000; // Timeout for checking if the connection is still valid
+    private static final int MAX_RETRY_ATTEMPTS = 3; // Maximum number of retry attempts
+    private static final long RETRY_DELAY_MS = 1000; // Delay between retry attempts
     
 
     public static synchronized Connection getConnection() throws SQLException {
-        if (connection == null || !isConnectionValid(connection)) {
-            connection = createNewConnection();
+        for (int attempt = 1; attempt <= MAX_RETRY_ATTEMPTS; attempt++) {
+            try {
+                Connection connection = dataSource.getConnection();
+                if (isConnectionValid(connection)) {
+                    return connection;
+                } else {
+                    connection.close();
+                }
+            } catch (SQLException e) {
+                if (attempt == MAX_RETRY_ATTEMPTS) {
+                    throw e;
+                }
+                try {
+                    Thread.sleep(RETRY_DELAY_MS);
+                } catch (InterruptedException ignored) {
+                }
+            }
         }
-        return connection;
-    }
-
-    private static Connection createNewConnection() throws SQLException {
-        return dataSource.getConnection();
+        throw new SQLException("Failed to obtain connection after maximum retry attempts");
     }
 
     private static boolean isConnectionValid(Connection connection) {
         try {
-            return connection.isValid(CONNECTION_TIMEOUT_MS); // Check if the connection is still valid
+            return connection.isValid(CONNECTION_TIMEOUT_MS);
         } catch (SQLException e) {
             return false;
         }
@@ -69,7 +80,6 @@ public class JdbcDatabaseService {
         // Add a connection test query to check if the connection is still valid
         config.setConnectionTestQuery("SELECT 1 FROM dual");
 
-        // Add other necessary configurations here
 
         dataSource = new HikariDataSource(config);
     }
