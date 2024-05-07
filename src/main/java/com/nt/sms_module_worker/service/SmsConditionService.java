@@ -26,6 +26,9 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.nt.sms_module_worker.model.dto.SmsConditionData;
 import com.nt.sms_module_worker.model.dto.config_conditions.ConfigCondition;
 import com.nt.sms_module_worker.model.dto.distribute.ReceivedData;
+import com.nt.sms_module_worker.util.DateTime;
+
+import ch.qos.logback.classic.pattern.Util;
 
 @Component
 public class SmsConditionService {
@@ -47,22 +50,15 @@ public class SmsConditionService {
 
   public String getQueryOrderTypeSmsCondition(ReceivedData receivedData) {
     // Get the current date
-    LocalDateTime currentDate = LocalDateTime.now();
-
-    // Define the desired output format
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMM yyyy HH.mm.ss.SSSSSSSSS");
-
-    // Format the date and time using the formatter
-    String formattedCurrentDate = currentDate.format(formatter);
+    Timestamp currentTime = DateTime.getTimeStampNow();
 
     String tableName = "config_conditions";
 
     String query = "SELECT * FROM "+ tableName +
                   " WHERE is_enable = 1"+
                   " AND ( orderType ='" + receivedData.getOrderType() + "'" + " OR orderType IS NULL )" +
-                  " AND ( date_Start <='" + formattedCurrentDate + "'" + " OR date_Start IS NULL )" +
-                  " AND ( date_End >='" + formattedCurrentDate + "'" + " OR date_End IS NULL )";      
-                  
+                  " AND ( date_Start <= TO_TIMESTAMP('" + currentTime + "', 'YYYY-MM-DD HH24:MI:SS.FF') OR date_Start IS NULL )" +
+                  " AND ( date_End >= TO_TIMESTAMP('" + currentTime + "', 'YYYY-MM-DD HH24:MI:SS.FF') OR date_End IS NULL )";         
     // System.out.println("query condition : "+query);
     return query;
     
