@@ -10,6 +10,7 @@ import com.nt.sms_module_worker.model.dto.SmsConditionData;
 import com.nt.sms_module_worker.model.dto.SmsGatewayData;
 import com.nt.sms_module_worker.model.dto.distribute.ReceivedData;
 import com.nt.sms_module_worker.util.DateTime;
+import com.nt.sms_module_worker.util.MapString;
 import com.nt.sms_module_worker.model.dto.OrderTypeData;
 
 import java.sql.SQLException;
@@ -94,17 +95,18 @@ public class KafkaConsumerService {
                 // System.out.println("smsEnableConditionGw remark" );
                 String querySmsCondition = smsConditionService.getQueryOrderTypeSmsCondition(receivedData);
                 List<SmsConditionData> smsConditions = smsConditionService.getListSmsCondition(querySmsCondition);
-                
+                System.out.println("smsConditions size: " + smsConditions.size() );
                 if (smsConditions.size() > 0) {    
                     // send sms
-                    // System.out.println("smsConditions size: " + smsConditions.size() );
+                    
                     boolean isNotMatchCondition = true;
                     for (SmsConditionData condition : smsConditions) {
                         JSONObject jsonData = new JSONObject(messageMq);
                         if (smsConditionService.checkSendSms(condition, jsonData)){
                             // System.out.println("condition.getSMSID(): " + condition.getSMSID());
                             isNotMatchCondition = false;
-                            String smsMessage = condition.getMessage();
+                            String conditionMessage = condition.getMessage();
+                            String smsMessage = MapString.mapPatternToSmsMessage(conditionMessage, jsonData);
                             SmsGatewayData smsMatchConditionGw = new SmsGatewayData();
                             Timestamp createdDate = DateTime.getTimeStampNow(); 
                             smsMatchConditionGw.setSMSMessage(smsMessage);

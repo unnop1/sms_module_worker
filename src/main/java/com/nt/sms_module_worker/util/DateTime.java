@@ -35,4 +35,12 @@ public class DateTime {
         String day = GetMonthStr(zonedDateTime.getDayOfMonth());
         return year+month+day;
     }
+
+    public static final Timestamp convertTimeStampDataModel(String input){
+        Instant instant = Instant.parse(input);
+
+        // Convert the Instant to a Timestamp
+        Timestamp timestamp = Timestamp.from(instant);
+        return timestamp;
+    }
 }
