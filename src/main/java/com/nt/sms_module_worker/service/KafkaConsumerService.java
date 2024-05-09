@@ -44,7 +44,8 @@ public class KafkaConsumerService {
 
     @KafkaListener(
         // {"orderType": "new", "payload":"123"}
-        topics = {"New", "Suspend", "Reconnect", "Change_Package", "Add_Package", "Delete_Package", "Topup_Recharge", "Package_Expire"}, 
+        // topics = {"New", "Suspend", "Reconnect", "Change_Package", "Add_Package", "Delete_Package", "Topup_Recharge", "Package_Expire"}, 
+        topics = {"NEW", "SUSPEND", "RECONNECT", "CHANGE_PACKAGE", "ADD_PACKAGE", "DELETE_PACKAGE", "TOPUP_RCHARGE", "PACKAGE_EXPIRE"}, 
         groupId = "sms_module.worker"
     )
     public void listening(@Payload String message, @Header(KafkaHeaders.RECEIVED_TOPIC) String topic) throws Exception {

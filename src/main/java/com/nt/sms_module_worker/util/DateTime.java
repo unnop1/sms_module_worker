@@ -2,8 +2,10 @@ package com.nt.sms_module_worker.util;
 
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class DateTime {
 
@@ -37,10 +39,10 @@ public class DateTime {
     }
 
     public static final Timestamp convertTimeStampDataModel(String input){
-        Instant instant = Instant.parse(input);
-
-        // Convert the Instant to a Timestamp
-        Timestamp timestamp = Timestamp.from(instant);
-        return timestamp;
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        LocalDateTime dateTime = LocalDateTime.parse(input, formatter);
+        Instant instant = dateTime.atZone(ZoneId.systemDefault()).toInstant();
+        Timestamp dataTime = Timestamp.from(instant);
+        return dataTime;
     }
 }

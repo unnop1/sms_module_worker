@@ -39,7 +39,7 @@ public class Condition {
             case "!=":
                 return dataValue != orConfValue;
             case "=":
-                return dataValue == orConfValue;
+                return dataValue.equals(orConfValue);
             default:
                 return false;
         }
@@ -80,11 +80,12 @@ public class Condition {
     public static final boolean doNumberOperation(String operator,Integer dataNumber, Integer orConfNumber){
         // int dataNumber = Integer.parseInt(dataValue);
         // int orConfNumber = Integer.parseInt(orConfValue);
+        // System.out.println(operator+" , dataNumber: "+dataNumber+ " , orConfNumber:"+ orConfNumber + " ==> "+(dataNumber == orConfNumber));
         switch (operator) {
             case "!=":
                 return dataNumber != orConfNumber;
             case "=":
-                return dataNumber == orConfNumber;
+                return dataNumber.equals(orConfNumber);
             case "<":
                 return dataNumber < orConfNumber;
             case ">":
@@ -119,9 +120,15 @@ public class Condition {
                         break;
                     case "between":
                         // Date Between
+                        System.out.println("dataStr:"+dataStr);
                         Timestamp dataTimestamp = DateTime.convertTimeStampDataModel(dataStr);
-                        Timestamp startTime = Timestamp.valueOf(dataStr);
-                        Timestamp endTime = Timestamp.valueOf(dataStr);
+                        String startTimeStr = conditionArray.getString(0);
+                        String endTimeStr = conditionArray.getString(1);
+                        System.out.println("startTimeStr:"+startTimeStr);
+                        System.out.println("endTimeStr:"+endTimeStr);
+                        Timestamp startTime = Timestamp.valueOf(startTimeStr);
+                        Timestamp endTime = Timestamp.valueOf(endTimeStr);
+
                         if (doTimeStampOperation(">=", dataTimestamp, startTime)&&
                             doTimeStampOperation("<=", dataTimestamp, endTime)) {
                             found = true;
@@ -135,7 +142,7 @@ public class Condition {
             case "Integer":
                 Integer dataInt = jsonData.getInt(conditionKey);
                 switch ( operation_type) {
-                    case "wherein":
+                    case "where in":
                         for (int i = 0; i < conditionArray.length(); i++) {
                             Integer conditionInt = conditionArray.getInt(i);
                             if (doNumberOperation("=", dataInt, conditionInt)) {
