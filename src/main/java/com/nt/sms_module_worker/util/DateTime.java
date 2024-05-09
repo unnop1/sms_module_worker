@@ -1,6 +1,8 @@
 package com.nt.sms_module_worker.util;
 
 import java.sql.Timestamp;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -39,10 +41,29 @@ public class DateTime {
     }
 
     public static final Timestamp convertTimeStampDataModel(String input){
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+        String simpleFormat = "yyyy-MM-dd";
+        String timeStampFormat = "yyyy-MM-dd HH:mm:ss";
+        boolean isSimpleFormat = validateDate(input, simpleFormat);
+        if (isSimpleFormat){
+            input = String.format("%s %s", input, "00:00:00");
+        }
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(timeStampFormat);
         LocalDateTime dateTime = LocalDateTime.parse(input, formatter);
         Instant instant = dateTime.atZone(ZoneId.systemDefault()).toInstant();
         Timestamp dataTime = Timestamp.from(instant);
         return dataTime;
+    }
+
+    public static boolean validateDate(String inputDate, String format) {
+        SimpleDateFormat sdf = new SimpleDateFormat(format);
+        sdf.setLenient(false); // Disable lenient parsing (strict parsing)
+
+        try {
+            sdf.parse(inputDate); // Try to parse the input date
+            return true; // If parsing succeeds, return true
+        } catch (ParseException e) {
+            return false; // If parsing fails, return false
+        }
     }
 }
