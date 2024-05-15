@@ -165,7 +165,9 @@ public boolean checkOrCondition(JSONObject orConf, JSONObject jsonData){
         String orConfType = Condition.checkFieldType(orConf, conditionKey);
         String dataType = Condition.checkFieldType(jsonData, conditionKey);
         System.out.println(conditionKey+ " have conf type "+ orConfType +" and data type "+ dataType);
-        if(orConfType == "ValueConfig"){
+        if (dataType == "NotFound"){
+            continue;
+        }else if(orConfType == "ValueConfig"){
             // String dataValue = jsonData.getString(key);
             JSONObject orValueConfig = orConf.getJSONObject(conditionKey);
             // String operation_type = orConfValue.getString("operation_type");
@@ -213,7 +215,9 @@ public boolean checkAndCondition(JSONObject andConf, JSONObject jsonData){
         String andConfType = Condition.checkFieldType(andConf, conditionKey);
         String dataType = Condition.checkFieldType(jsonData, conditionKey);
         System.out.println("root==> "+conditionKey+ " have conf type "+ andConfType +" and data type "+ dataType);
-        if(andConfType == "ValueConfig"){
+        if (dataType == "NotFound"){
+            continue;
+        }else if(andConfType == "ValueConfig"){
             // String dataValue = jsonData.getString(key);
             JSONObject orValueConfig = andConf.getJSONObject(conditionKey);
             // String operation_type = orConfValue.getString("operation_type");
