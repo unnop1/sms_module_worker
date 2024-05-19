@@ -3,6 +3,7 @@ package com.nt.sms_module_worker.service;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.Payload;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.kafka.support.KafkaHeaders;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -15,9 +16,6 @@ import com.nt.sms_module_worker.model.dto.OrderTypeData;
 
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.time.Instant;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,7 +26,7 @@ import org.springframework.kafka.annotation.EnableKafka;
     
 // Method 
 @EnableKafka
-@Service
+@Component
 public class KafkaConsumerService {
 
     private final Integer MaxRetrySendSmsCount = 3;  
@@ -43,10 +41,11 @@ public class KafkaConsumerService {
     private SmsGatewayService smsGatewayService;
 
     @KafkaListener(
+        autoStartup="true",
         // {"orderType": "new", "payload":"123"}
         // topics = {"New", "Suspend", "Reconnect", "Change_Package", "Add_Package", "Delete_Package", "Topup_Recharge", "Package_Expire"}, 
         topics = {"NEW", "SUSPEND", "RECONNECT", "CHANGE_PACKAGE", "ADD_PACKAGE", "DELETE_PACKAGE", "TOPUP_RCHARGE", "PACKAGE_EXPIRE"}, 
-        groupId = "sms_module.worker"
+        groupId = "sms_module.worker.test"
     )
     public void listening(@Payload String message, @Header(KafkaHeaders.RECEIVED_TOPIC) String topic) throws Exception {
         // System.out.println("Received message from topic " + topic);
