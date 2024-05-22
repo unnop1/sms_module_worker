@@ -119,12 +119,16 @@ public class Condition {
                     }
                 }
             }
-        } 
+        } else if (obj instanceof Integer) {
+            return "Integer";
+        } else if (obj instanceof String) {
+            return "String";
+        }
         return "Unknown";
     }
 
 
-    public static final boolean doArrayOperation(String condition_type,String operation_type, String conditionKey,JSONObject jsonData, JSONArray conditionArray){
+    public static final boolean doArrayOperation(String operation_type, String conditionKey,JSONObject jsonData, JSONArray conditionArray){
         String dataType = Condition.checkFieldType(jsonData, conditionKey);
         System.out.println("================================ doArrayOperation ===========================================");
         System.out.println(" conditionKey : " + conditionKey);
@@ -236,7 +240,7 @@ public class Condition {
         }
     }
 
-    public static final Boolean doCondition(String condition_type, JSONObject jsonData, String conditionKey, JSONObject orValueConfig){
+    public static final Boolean doCondition(JSONObject jsonData, String conditionKey, JSONObject orValueConfig){
         // check condition
         String configValueType = Condition.checkFieldType(orValueConfig, "value");
         System.out.println("================================doCondition================================");
@@ -261,7 +265,7 @@ public class Condition {
                 return Condition.doStringOperation(operation_type, dataStr, conditionStr);
             case "JSONArray":
                 JSONArray conditionArray = orValueConfig.getJSONArray("value");
-                return Condition.doArrayOperation(condition_type, operation_type, conditionKey, jsonData, conditionArray);
+                return Condition.doArrayOperation(operation_type, conditionKey, jsonData, conditionArray);
             default:
                 return false;
         }
@@ -321,7 +325,7 @@ public class Condition {
                     }
                 }else{
                     JSONObject orValueConfig = orConf.getJSONObject(conditionKey);
-                    isMatchCondition = doCondition("or",jsonData, conditionKey, orValueConfig);
+                    isMatchCondition = doCondition(jsonData, conditionKey, orValueConfig);
                 }
                 // System.out.println(conditionKey+ " have conf type "+ orConfType +" and data type "+ dataType + " isMatchCondition :"+ isMatchCondition );
                 if (isMatchCondition){
@@ -366,7 +370,7 @@ public class Condition {
                     // String dataValue = jsonData.getString(key);
                     JSONObject orValueConfig = andConf.getJSONObject(conditionKey);
                     // String operation_type = orConfValue.getString("operation_type");
-                    isMatchCondition = doCondition("and", jsonData, conditionKey, orValueConfig);
+                    isMatchCondition = doCondition( jsonData, conditionKey, orValueConfig);
                     System.out.println(conditionKey+ " have conf type "+ andConfType +" and data type "+ dataType + " isMatchCondition :"+ isMatchCondition);
                 }
 
