@@ -1,6 +1,8 @@
 package com.nt.sms_module_worker.util;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -247,7 +249,7 @@ public class Condition {
         // check condition
         String configValueType = Condition.checkFieldType(orValueConfig, "value");
         System.out.println("================================doCondition================================");
-        System.out.println("orValueConfig:"+orValueConfig.toString());
+        System.out.println("ValueConfig:"+orValueConfig.toString());
         System.out.println("checkFieldType:"+configValueType);
         System.out.println("jsonData:"+jsonData.toString());
         String operation_type = orValueConfig.getString("operation_type").toLowerCase();
@@ -274,7 +276,7 @@ public class Condition {
         }
     }
 
-    public static boolean checkConditionValueConfigArray(String conditionKey, JSONObject jsonData, JSONObject andConf){
+    public static boolean checkOrConditionValueConfigArray(String conditionKey, JSONObject jsonData, JSONObject andConf){
         Boolean isMatchArrayCondition = false;
         JSONArray jsonArray = jsonData.getJSONArray(conditionKey);
         // All element in arrays is AND conditions
@@ -282,6 +284,39 @@ public class Condition {
             for (int i = 0; i < jsonArray.length(); i++){
                 JSONObject dataJson = jsonArray.getJSONObject(i); // first element only
                 // System.out.println("next array data==> "+dataJson.toString());
+                JSONObject orConditionFound = andConf.optJSONObject(conditionKey);
+                System.out.println("next orConditionFound data==> "+orConditionFound.toString());
+                if(orConditionFound == null || dataJson == null){
+                    continue;
+                }
+                
+                JSONObject valueConfig = andConf.getJSONObject(conditionKey);
+                JSONArray values = valueConfig.getJSONArray("value");
+                for (int j = 0; j < values.length(); j++){
+                    JSONObject subCondition = values.getJSONObject(j);
+                    // System.out.println("next array data==> "+dataJson.toString());
+                    System.out.println(" conditionKey==> "+conditionKey);
+                    System.out.println("next subCondition==> "+subCondition.toString() );
+                    isMatchArrayCondition = checkOrCondition(subCondition, dataJson);
+                    System.out.println("isMatchArrayCondition==> "+isMatchArrayCondition);
+                    if (!isMatchArrayCondition){
+                        return false;
+                    }
+                    
+                }
+            }
+        }
+        return isMatchArrayCondition;
+    }
+
+    public static boolean checkAndConditionValueConfigArray(String conditionKey, JSONObject jsonData, JSONObject andConf){
+        Boolean isMatchArrayCondition = false;
+        JSONArray jsonArray = jsonData.getJSONArray(conditionKey);
+        // All element in arrays is AND conditions
+        if(jsonArray.length() > 0){
+            for (int i = 0; i < jsonArray.length(); i++){
+                JSONObject dataJson = jsonArray.getJSONObject(i); // first element only
+                System.out.println("next array data==> "+dataJson.toString());
                 JSONObject andConditionFound = andConf.optJSONObject(conditionKey);
                 System.out.println("next andConditionFound data==> "+andConditionFound.toString());
                 if(andConditionFound == null || dataJson == null){
@@ -314,15 +349,15 @@ public class Condition {
         for (String conditionKey : orConf.keySet()){
             String orConfType = Condition.checkFieldType(orConf, conditionKey);
             String dataType = Condition.checkFieldType(jsonData, conditionKey);
-            System.out.println(conditionKey+ " have conf type "+ orConfType +" and data type "+ dataType);
+            System.out.println(conditionKey+ " have orconf type "+ orConfType +" and data type "+ dataType);
             if (dataType == "NotFound"){
-                return false;
+                return true;
             }else if(orConfType == "ValueConfig"){
                 // String dataValue = jsonData.getString(key);
                 
                 // String operation_type = orConfValue.getString("operation_type");
                 if (dataType == "JSONArray"){
-                    boolean isMatchArrayCondition = checkConditionValueConfigArray(conditionKey, jsonData, orConf);
+                    boolean isMatchArrayCondition = checkOrConditionValueConfigArray(conditionKey, jsonData, orConf);
                     if (isMatchArrayCondition){
                         return true;
                     }
@@ -330,14 +365,15 @@ public class Condition {
                     JSONObject orValueConfig = orConf.getJSONObject(conditionKey);
                     isMatchCondition = doCondition(jsonData, conditionKey, orValueConfig);
                 }
-                // System.out.println(conditionKey+ " have conf type "+ orConfType +" and data type "+ dataType + " isMatchCondition :"+ isMatchCondition );
+                System.out.println(conditionKey+ " have orconf type "+ orConfType +" and data type "+ dataType + " isMatchCondition :"+ isMatchCondition );
                 if (isMatchCondition){
                     return true;
                 }
             }else{
                 // Sub Object
                 if (dataType == "JSONArray"){
-                    boolean isMatchArrayCondition = checkConditionValueConfigArray(conditionKey, jsonData, orConf);
+                    System.out.println("OR Condition array");
+                    boolean isMatchArrayCondition = checkOrConditionValueConfigArray(conditionKey, jsonData, orConf);
                     if (isMatchArrayCondition){
                         return true;
                     }
@@ -361,11 +397,12 @@ public class Condition {
             String andConfType = Condition.checkFieldType(andConf, conditionKey);
             String dataType = Condition.checkFieldType(jsonData, conditionKey);
             System.out.println("root==> "+conditionKey+ " have conf type "+ andConfType +" and data type "+ dataType);
+            System.out.println("jsonData:"+jsonData.toString());
             if (dataType == "NotFound"){
                 return false;
             }else if(andConfType == "ValueConfig"){
                 if (dataType == "JSONArray"){
-                    boolean isMatchArrayCondition = checkConditionValueConfigArray(conditionKey, jsonData, andConf);
+                    boolean isMatchArrayCondition = checkAndConditionValueConfigArray(conditionKey, jsonData, andConf);
                     if (!isMatchArrayCondition){
                         return false;
                     }
@@ -374,7 +411,7 @@ public class Condition {
                     JSONObject orValueConfig = andConf.getJSONObject(conditionKey);
                     // String operation_type = orConfValue.getString("operation_type");
                     isMatchCondition = doCondition( jsonData, conditionKey, orValueConfig);
-                    System.out.println(conditionKey+ " have conf type "+ andConfType +" and data type "+ dataType + " isMatchCondition :"+ isMatchCondition);
+                    System.out.println(conditionKey+ " have andconf type "+ andConfType +" and data type "+ dataType + " isMatchCondition :"+ isMatchCondition);
                 }
 
                 if (!isMatchCondition){
@@ -383,7 +420,7 @@ public class Condition {
             }else{
                 // Sub Object
                 if (dataType == "JSONArray"){
-                    boolean isMatchArrayCondition = checkConditionValueConfigArray(conditionKey, jsonData, andConf);
+                    boolean isMatchArrayCondition = checkAndConditionValueConfigArray(conditionKey, jsonData, andConf);
                     if (!isMatchArrayCondition){
                         return false;
                     }

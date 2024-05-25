@@ -116,15 +116,19 @@ public class SmsConditionService {
 
 
     public boolean checkSendSms(SmsConditionData smsCondition , JSONObject jsonData) throws JsonMappingException, JsonProcessingException {
-    // System.out.println("smsCondition.getConditions_or:"+smsCondition.getConditions_or());
-    // System.out.println("smsCondition.getConditions_and:"+smsCondition.getConditions_and());
+    System.out.println("smsCondition.getConditions_and:"+smsCondition.getConditions_or());
+    System.out.println("smsCondition.getConditions_or:"+smsCondition.getConditions_and());
         try{
-            if(smsCondition.getConditions_and() != null){
-                // System.out.println("smsCondition.getConditions_and:"+smsCondition.getConditions_and());
-                JSONArray jsonSmsAndCon = new JSONArray(smsCondition.getConditions_and());
+            if(smsCondition.getConditions_or() != null){
+                /*  
+                    User want to swap condition AND to OR
+                */
+                System.out.println("smsCondition.getConditions_and:"+smsCondition.getConditions_or());
+                JSONArray jsonSmsAndCon = new JSONArray(smsCondition.getConditions_or());
                 
                 for (int i = 0; i < jsonSmsAndCon.length(); i++) {
                     JSONObject conf = jsonSmsAndCon.getJSONObject(i);
+                    System.out.println("And round:"+i);
                     if (!Condition.checkAndCondition(conf, jsonData)){
                         System.out.println("return not match and");
                         return false;
@@ -132,16 +136,21 @@ public class SmsConditionService {
                 }
             }
 
-            if(smsCondition.getConditions_or()!= null){
-                // System.out.println("smsCondition.getConditions_or:"+smsCondition.getConditions_or());
-                JSONArray jsonSmsOrCon = new JSONArray(smsCondition.getConditions_or());
+            if(smsCondition.getConditions_and()!= null){
+                /*  
+                    User want to swap condition OR to AND
+                */
+                System.out.println("smsCondition.getConditions_or:"+smsCondition.getConditions_and());
+                JSONArray jsonSmsOrCon = new JSONArray(smsCondition.getConditions_and());
                 
                 for (int i = 0; i < jsonSmsOrCon.length(); i++) {
                     JSONObject conf = jsonSmsOrCon.getJSONObject(i);
+                    System.out.println("Or round:"+i);
                     if (!Condition.checkOrCondition(conf, jsonData)){ 
                         System.out.println("return not match or");
                         return false;
                     }
+                    
                 }
             }
 
