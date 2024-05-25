@@ -75,6 +75,21 @@ public class KafkaConsumerService {
         Timestamp receiveDate = DateTime.getTimeStampNow();
         ObjectMapper objectMapper = new ObjectMapper();
         ReceivedData receivedData = objectMapper.readValue(messageMq, ReceivedData.class);
+
+        // Check PDPA
+        if (!isAcceptedPDPA()){
+            Timestamp createdDate = DateTime.getTimeStampNow();        
+            SmsGatewayData smsMisMatchConditionGw = new SmsGatewayData();
+            smsMisMatchConditionGw.setPhoneNumber(receivedData.getMsisdn());
+            smsMisMatchConditionGw.setOrderType(receivedData.getOrderType().toUpperCase());
+            smsMisMatchConditionGw.setIs_Status(2);
+            smsMisMatchConditionGw.setPayloadMQ(messageMq);
+            smsMisMatchConditionGw.setReceive_date(receiveDate);
+            smsMisMatchConditionGw.setTransaction_id(getTransactionID(createdDate));
+            smsMisMatchConditionGw.setRemark("not accept pdpa OrderType "+receivedData.getOrderType());
+            smsMisMatchConditionGw.setCreated_Date(createdDate);
+            smsGatewayService.createConditionalMessage(smsMisMatchConditionGw);
+        }
         
         String queryOrderType = orderTypeService.getQueryOrderTypeAvailable(receivedData); 
         OrderTypeData orderTypeData = orderTypeService.getOrderType(queryOrderType);
@@ -205,9 +220,8 @@ public class KafkaConsumerService {
         }
     }
 
-    // private void processSuspendedOrderType(String messageMq) {
-    //     // Process for new_order_type 
-    //     // System.out.println("Processing suspend_order: " + order.getOrder_type());
-    // }
+    private boolean isAcceptedPDPA(){
+        return true;
+    }
 }
 

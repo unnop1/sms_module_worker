@@ -316,7 +316,7 @@ public class Condition {
             String dataType = Condition.checkFieldType(jsonData, conditionKey);
             System.out.println(conditionKey+ " have conf type "+ orConfType +" and data type "+ dataType);
             if (dataType == "NotFound"){
-                continue;
+                return false;
             }else if(orConfType == "ValueConfig"){
                 // String dataValue = jsonData.getString(key);
                 
@@ -362,7 +362,7 @@ public class Condition {
             String dataType = Condition.checkFieldType(jsonData, conditionKey);
             System.out.println("root==> "+conditionKey+ " have conf type "+ andConfType +" and data type "+ dataType);
             if (dataType == "NotFound"){
-                continue;
+                return false;
             }else if(andConfType == "ValueConfig"){
                 if (dataType == "JSONArray"){
                     boolean isMatchArrayCondition = checkConditionValueConfigArray(conditionKey, jsonData, andConf);
