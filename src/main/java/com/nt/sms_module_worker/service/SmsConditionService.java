@@ -1,25 +1,33 @@
 package com.nt.sms_module_worker.service;
 
+import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import org.apache.kafka.common.protocol.types.Field.Bool;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import java.util.List;
+import java.util.Map;
 
+import org.springframework.amqp.core.Message;
+import org.springframework.amqp.core.MessageProperties;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 // import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nt.sms_module_worker.model.dto.SmsConditionData;
+import com.nt.sms_module_worker.model.dto.SmsGatewayData;
 import com.nt.sms_module_worker.model.dto.distribute.ReceivedData;
+import com.nt.sms_module_worker.model.dto.distribute.SendSmsGatewayData;
 import com.nt.sms_module_worker.util.Condition;
 import com.nt.sms_module_worker.util.DateTime;
 
@@ -32,10 +40,26 @@ public class SmsConditionService {
     this.rabbitTemplate = rabbitTemplate;
   }
 
-  public void publish(String exchangeName, String routingKey,String message) throws Exception {
+  public void publish(String exchangeName, String routingKey,SendSmsGatewayData bulkMessage) throws Exception {
     // System.out.println("Sending message...");
-    rabbitTemplate.convertAndSend("", routingKey, message);
-    // receiver.getLatch().await(10000, TimeUnit.MILLISECONDS);
+    // rabbitTemplate.convertAndSend("", routingKey, bulkMessage);
+    // Serialize the message object to JSON
+    ObjectMapper objectMapper = new ObjectMapper();
+    String message = objectMapper.writeValueAsString(bulkMessage);
+
+    // Set the headers
+    Map<String, Object> headers = new HashMap<>();
+    headers.put("__TypeId__", "cat.shot.smsc.dto.BulkMessage");
+    headers.put("content_encoding", "UTF-8");
+    headers.put("content_type", "application/json");
+
+    // Create message properties and set headers
+    MessageProperties messageProperties = new MessageProperties();
+    headers.forEach(messageProperties::setHeader);
+
+    // Create and send the message
+    Message rabbitMessage = new Message(message.getBytes(StandardCharsets.UTF_8), messageProperties);
+    rabbitTemplate.convertAndSend(exchangeName, routingKey, rabbitMessage);
   }
 
   public String getQueryOrderTypeSmsCondition(ReceivedData receivedData) {

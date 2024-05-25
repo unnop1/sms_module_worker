@@ -9,13 +9,16 @@ import org.springframework.kafka.support.KafkaHeaders;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nt.sms_module_worker.model.dto.SmsConditionData;
 import com.nt.sms_module_worker.model.dto.SmsGatewayData;
+import com.nt.sms_module_worker.model.dto.distribute.DataSmsMessage;
 import com.nt.sms_module_worker.model.dto.distribute.ReceivedData;
+import com.nt.sms_module_worker.model.dto.distribute.SendSmsGatewayData;
 import com.nt.sms_module_worker.util.DateTime;
 import com.nt.sms_module_worker.util.MapString;
 import com.nt.sms_module_worker.model.dto.OrderTypeData;
 
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -126,7 +129,17 @@ public class KafkaConsumerService {
                             
                             for (int sendSmsCount = 1; sendSmsCount <= MaxRetrySendSmsCount ; sendSmsCount++) {
                                 try{
-                                    smsConditionService.publish("","sms_gateway_nt" , smsMessage);
+                                    DataSmsMessage smsData = new DataSmsMessage();
+                                    smsData.setMessage(smsMessage);
+                                    smsData.setTarget(receivedData.getMsisdn());
+                                    smsData.setSource("myMessage");
+                                    List<DataSmsMessage> smsMessages = new ArrayList<>();
+                                    smsMessages.add(smsData);
+                                    
+                                    SendSmsGatewayData sendSmsData = new SendSmsGatewayData();
+                                    sendSmsData.setBulkRef("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
+                                    sendSmsData.setMessages(smsMessages);
+                                    smsConditionService.publish("RtcSmsBatchEx","" , sendSmsData);
                                     break;
                                 }catch (Exception e){
                                     if (sendSmsCount >= MaxRetrySendSmsCount){

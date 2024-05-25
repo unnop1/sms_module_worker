@@ -152,20 +152,22 @@ public class Condition {
                                     String conditionStr = conditionArray.getString(i);
                                     if (doStringOperation("=", dataStr, conditionStr)) {
                                         found = true;
-                                        break;
                                     }
                                     break;
                                 case "ValueConfig":
                                     JSONObject subCondition = conditionArray.getJSONObject(i);
                                     System.out.println("==> subCondition : " + subCondition);
                                     boolean isMatchCondition = checkAndCondition(subCondition, jsonData);
-                                    if (!isMatchCondition){
-                                        return false;
+                                    if (isMatchCondition){
+                                        found = true;
                                     }
                                     break;
                                 default:
                                     found = true;
                                     break;
+                            }
+                            if(found){
+                                return found;
                             }
                         }
                         break;
@@ -203,20 +205,21 @@ public class Condition {
                                 Integer conditionStr = conditionArray.getInt(i);
                                 if (doNumberOperation("=", dataInt, conditionStr)) {
                                     found = true;
-                                    break;
                                 }
                                 break;
                             case "ValueConfig":
                                 JSONObject subCondition = conditionArray.getJSONObject(i);
                                 System.out.println("==> subCondition : " + subCondition);
-                                boolean isMatchCondition = checkAndCondition(subCondition, jsonData);
-                                if (!isMatchCondition){
-                                    return false;
+                                if (checkAndCondition(subCondition, jsonData)){
+                                    found = true;
                                 }
                                 break;
                             default:
                                 found = true;
                                 break;
+                        }
+                        if(found){
+                            return found;
                         }
                     }
                     break;
@@ -272,7 +275,7 @@ public class Condition {
     }
 
     public static boolean checkConditionValueConfigArray(String conditionKey, JSONObject jsonData, JSONObject andConf){
-        Boolean isMatchArrayCondition = true;
+        Boolean isMatchArrayCondition = false;
         JSONArray jsonArray = jsonData.getJSONArray(conditionKey);
         // All element in arrays is AND conditions
         if(jsonArray.length() > 0){
@@ -294,8 +297,8 @@ public class Condition {
                     System.out.println("next subCondition==> "+subCondition.toString() );
                     isMatchArrayCondition = checkAndCondition(subCondition, dataJson);
                     System.out.println("isMatchArrayCondition==> "+isMatchArrayCondition);
-                    if (!isMatchArrayCondition){
-                        return false;
+                    if (isMatchArrayCondition){
+                        return true;
                     }
                     
                 }
