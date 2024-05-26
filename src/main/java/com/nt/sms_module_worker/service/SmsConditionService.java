@@ -119,12 +119,12 @@ public class SmsConditionService {
     System.out.println("smsCondition.getConditions_and:"+smsCondition.getConditions_or());
     System.out.println("smsCondition.getConditions_or:"+smsCondition.getConditions_and());
         try{
-            if(smsCondition.getConditions_or() != null){
+            if(smsCondition.getConditions_and() != null){
                 /*  
                     User want to swap condition AND to OR
                 */
-                System.out.println("smsCondition.getConditions_and:"+smsCondition.getConditions_or());
-                JSONArray jsonSmsAndCon = new JSONArray(smsCondition.getConditions_or());
+                // System.out.println("smsCondition.getConditions_and:"+smsCondition.getConditions_and());
+                JSONArray jsonSmsAndCon = new JSONArray(smsCondition.getConditions_and());
                 
                 for (int i = 0; i < jsonSmsAndCon.length(); i++) {
                     JSONObject conf = jsonSmsAndCon.getJSONObject(i);
@@ -136,12 +136,12 @@ public class SmsConditionService {
                 }
             }
 
-            if(smsCondition.getConditions_and()!= null){
+            if(smsCondition.getConditions_or()!= null){
                 /*  
                     User want to swap condition OR to AND
                 */
-                System.out.println("smsCondition.getConditions_or:"+smsCondition.getConditions_and());
-                JSONArray jsonSmsOrCon = new JSONArray(smsCondition.getConditions_and());
+                // System.out.println("smsCondition.getConditions_or:"+smsCondition.getConditions_or());
+                JSONArray jsonSmsOrCon = new JSONArray(smsCondition.getConditions_or());
                 
                 for (int i = 0; i < jsonSmsOrCon.length(); i++) {
                     JSONObject conf = jsonSmsOrCon.getJSONObject(i);
