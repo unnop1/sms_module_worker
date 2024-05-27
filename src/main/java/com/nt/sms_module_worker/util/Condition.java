@@ -278,6 +278,7 @@ public class Condition {
 
     public static boolean checkOrConditionValueConfigArray(String conditionKey, JSONObject jsonData, JSONObject andConf){
         Boolean isMatchArrayCondition = false;
+        Boolean isMatchAllData = true;
         JSONArray jsonArray = jsonData.getJSONArray(conditionKey);
         // All element in arrays is AND conditions
         if(jsonArray.length() > 0){
@@ -291,16 +292,28 @@ public class Condition {
                 }
                 
                 JSONObject valueConfig = andConf.getJSONObject(conditionKey);
+                String operationType = valueConfig.getString("operation_type");
+                if (operationType.equals("WHERE NOT IN")){
+                    isMatchAllData = false;
+                }
                 JSONArray values = valueConfig.getJSONArray("value");
                 for (int j = 0; j < values.length(); j++){
                     JSONObject subCondition = values.getJSONObject(j);
                     // System.out.println("next array data==> "+dataJson.toString());
                     System.out.println(" conditionKey==> "+conditionKey);
                     System.out.println("next subCondition==> "+subCondition.toString() );
-                    isMatchArrayCondition = checkOrCondition(subCondition, dataJson);
-                    System.out.println("isMatchArrayCondition==> "+isMatchArrayCondition);
-                    if (!isMatchArrayCondition){
-                        return false;
+                    if (!isMatchAllData){
+                        isMatchArrayCondition = checkAndCondition(subCondition, dataJson);
+                        System.out.println("isMatchArrayCondition==> "+isMatchArrayCondition);
+                        if (isMatchArrayCondition){
+                            return true;
+                        }
+                    }else{
+                        isMatchArrayCondition = checkOrCondition(subCondition, dataJson);
+                        System.out.println("isMatchArrayCondition==> "+isMatchArrayCondition);
+                        if (!isMatchArrayCondition){
+                            return false;
+                        }
                     }
                     
                 }
@@ -311,6 +324,7 @@ public class Condition {
 
     public static boolean checkAndConditionValueConfigArray(String conditionKey, JSONObject jsonData, JSONObject andConf){
         Boolean isMatchArrayCondition = false;
+        Boolean isMatchAllData = false;
         JSONArray jsonArray = jsonData.getJSONArray(conditionKey);
         // All element in arrays is AND conditions
         if(jsonArray.length() > 0){
@@ -324,16 +338,28 @@ public class Condition {
                 }
                 
                 JSONObject valueConfig = andConf.getJSONObject(conditionKey);
+                String operationType = valueConfig.getString("operation_type");
+                if (operationType.equals("WHERE NOT IN")){
+                    isMatchAllData = true;
+                }
                 JSONArray values = valueConfig.getJSONArray("value");
                 for (int j = 0; j < values.length(); j++){
                     JSONObject subCondition = values.getJSONObject(j);
                     // System.out.println("next array data==> "+dataJson.toString());
                     System.out.println(" conditionKey==> "+conditionKey);
                     System.out.println("next subCondition==> "+subCondition.toString() );
-                    isMatchArrayCondition = checkAndCondition(subCondition, dataJson);
-                    System.out.println("isMatchArrayCondition==> "+isMatchArrayCondition);
-                    if (isMatchArrayCondition){
-                        return true;
+                    if (!isMatchAllData){
+                        isMatchArrayCondition = checkAndCondition(subCondition, dataJson);
+                        System.out.println("isMatchArrayCondition==> "+isMatchArrayCondition);
+                        if (isMatchArrayCondition){
+                            return true;
+                        }
+                    }else{
+                        isMatchArrayCondition = checkOrCondition(subCondition, dataJson);
+                        System.out.println("isMatchArrayCondition==> "+isMatchArrayCondition);
+                        if (!isMatchArrayCondition){
+                            return false;
+                        }
                     }
                     
                 }
