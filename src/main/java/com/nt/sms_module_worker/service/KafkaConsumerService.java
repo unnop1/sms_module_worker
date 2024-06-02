@@ -3,21 +3,22 @@ package com.nt.sms_module_worker.service;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.Payload;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.kafka.support.KafkaHeaders;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nt.sms_module_worker.model.dto.SmsConditionData;
 import com.nt.sms_module_worker.model.dto.SmsGatewayData;
+import com.nt.sms_module_worker.model.dto.distribute.DataSmsMessage;
 import com.nt.sms_module_worker.model.dto.distribute.ReceivedData;
+import com.nt.sms_module_worker.model.dto.distribute.SendSmsGatewayData;
 import com.nt.sms_module_worker.util.DateTime;
 import com.nt.sms_module_worker.util.MapString;
 import com.nt.sms_module_worker.model.dto.OrderTypeData;
 
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.time.Instant;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,7 +29,7 @@ import org.springframework.kafka.annotation.EnableKafka;
     
 // Method 
 @EnableKafka
-@Service
+@Component
 public class KafkaConsumerService {
 
     private final Integer MaxRetrySendSmsCount = 3;  
@@ -43,6 +44,7 @@ public class KafkaConsumerService {
     private SmsGatewayService smsGatewayService;
 
     @KafkaListener(
+        autoStartup="true",
         // {"orderType": "new", "payload":"123"}
         // topics = {"New", "Suspend", "Reconnect", "Change_Package", "Add_Package", "Delete_Package", "Topup_Recharge", "Package_Expire"}, 
         topics = {"NEW", "SUSPEND", "RECONNECT", "CHANGE_PACKAGE", "ADD_PACKAGE", "DELETE_PACKAGE", "TOPUP_RCHARGE", "PACKAGE_EXPIRE"}, 
@@ -73,6 +75,21 @@ public class KafkaConsumerService {
         Timestamp receiveDate = DateTime.getTimeStampNow();
         ObjectMapper objectMapper = new ObjectMapper();
         ReceivedData receivedData = objectMapper.readValue(messageMq, ReceivedData.class);
+
+        // Check PDPA
+        if (!isAcceptedPDPA()){
+            Timestamp createdDate = DateTime.getTimeStampNow();        
+            SmsGatewayData smsMisMatchConditionGw = new SmsGatewayData();
+            smsMisMatchConditionGw.setPhoneNumber(receivedData.getMsisdn());
+            smsMisMatchConditionGw.setOrderType(receivedData.getOrderType().toUpperCase());
+            smsMisMatchConditionGw.setIs_Status(2);
+            smsMisMatchConditionGw.setPayloadMQ(messageMq);
+            smsMisMatchConditionGw.setReceive_date(receiveDate);
+            smsMisMatchConditionGw.setTransaction_id(getTransactionID(createdDate));
+            smsMisMatchConditionGw.setRemark("not accept pdpa OrderType "+receivedData.getOrderType());
+            smsMisMatchConditionGw.setCreated_Date(createdDate);
+            smsGatewayService.createConditionalMessage(smsMisMatchConditionGw);
+        }
         
         String queryOrderType = orderTypeService.getQueryOrderTypeAvailable(receivedData); 
         OrderTypeData orderTypeData = orderTypeService.getOrderType(queryOrderType);
@@ -127,7 +144,17 @@ public class KafkaConsumerService {
                             
                             for (int sendSmsCount = 1; sendSmsCount <= MaxRetrySendSmsCount ; sendSmsCount++) {
                                 try{
-                                    smsConditionService.publish("","sms_gateway_nt" , smsMessage);
+                                    DataSmsMessage smsData = new DataSmsMessage();
+                                    smsData.setMessage(smsMessage);
+                                    smsData.setTarget(receivedData.getMsisdn());
+                                    smsData.setSource("myMessage");
+                                    List<DataSmsMessage> smsMessages = new ArrayList<>();
+                                    smsMessages.add(smsData);
+                                    
+                                    SendSmsGatewayData sendSmsData = new SendSmsGatewayData();
+                                    sendSmsData.setBulkRef("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
+                                    sendSmsData.setMessages(smsMessages);
+                                    smsConditionService.publish("RtcSmsBatchEx","" , sendSmsData);
                                     break;
                                 }catch (Exception e){
                                     if (sendSmsCount >= MaxRetrySendSmsCount){
@@ -193,9 +220,8 @@ public class KafkaConsumerService {
         }
     }
 
-    // private void processSuspendedOrderType(String messageMq) {
-    //     // Process for new_order_type 
-    //     // System.out.println("Processing suspend_order: " + order.getOrder_type());
-    // }
+    private boolean isAcceptedPDPA(){
+        return true;
+    }
 }
 

@@ -5,7 +5,6 @@ import java.sql.Timestamp;
 
 import lombok.Getter;
 import lombok.Setter;
-import net.sf.jsqlparser.expression.DateTimeLiteralExpression.DateTime;
 
 
 @Getter
