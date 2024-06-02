@@ -21,7 +21,7 @@ public class DataSmsMessage {
 
     // SMS sender name
     @JsonProperty("source")
-    private String source;
+    private String source="my";
 
     // message reference transaction id (for transaction tracking)
     @JsonProperty("systemTransRef")

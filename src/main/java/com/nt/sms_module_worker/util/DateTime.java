@@ -40,6 +40,28 @@ public class DateTime {
         return year+month+day;
     }
 
+    public static final Timestamp getRequestDateUtcNow(){
+        // Get the current instant
+        Instant now = Instant.now();
+
+        // Convert to UTC time zone
+        LocalDateTime utcDateTime = LocalDateTime.ofInstant(now, ZoneId.of("UTC"));
+
+        // Define the desired format
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+        // Format the UTC time to the desired format
+        String formattedDateTime = utcDateTime.format(formatter);
+
+        // Parse the string to a LocalDateTime
+        LocalDateTime localDateTime = LocalDateTime.parse(formattedDateTime, formatter);
+
+        // Convert LocalDateTime to java.sql.Timestamp
+        Timestamp sqlTimestamp = Timestamp.valueOf(localDateTime);
+
+        return sqlTimestamp;
+    }
+
     public static final Timestamp convertTimeStampDataModel(String input){
 
         String simpleFormat = "yyyy-MM-dd";
