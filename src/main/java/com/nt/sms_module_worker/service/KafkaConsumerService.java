@@ -60,6 +60,7 @@ public class KafkaConsumerService {
         try {
             
             // Process the message based on the queue name
+            // System.out.println("isSkipPDPA:"+ pdpaService.getIsSkipPDPA());
             processOrderType(message);
         } catch (Exception e) {
             e.printStackTrace();
