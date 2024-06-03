@@ -1,11 +1,12 @@
 package com.nt.sms_module_worker.service;
 
 import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.kafka.annotation.TopicPartition;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.Payload;
-import org.springframework.stereotype.Component;
-import java.util.UUID;
 import org.springframework.kafka.support.KafkaHeaders;
+import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nt.sms_module_worker.model.dto.SmsConditionData;
 import com.nt.sms_module_worker.model.dto.SmsGatewayData;
@@ -33,6 +34,9 @@ import org.springframework.kafka.annotation.EnableKafka;
 public class KafkaConsumerService {
 
     private final Integer MaxRetrySendSmsCount = 3;  
+
+    @Autowired
+    private PDPAService pdpaService;
 
     @Autowired
     private SmsConditionService smsConditionService;
@@ -101,34 +105,31 @@ public class KafkaConsumerService {
                 System.out.println("smsConditions size: " + smsConditions.size() );
                 
                 if (smsConditions.size() > 0) {    
-                    // send sms   
-                    Boolean isAcceptPDPACheck = false;                 
+                    // send sms                  
                     for (SmsConditionData condition : smsConditions) {
                         JSONObject jsonData = new JSONObject(messageMq);
                         if (smsConditionService.checkSendSms(condition, jsonData)){
-                            if(!isAcceptPDPACheck){
-                                // Check PDPA
-                                if (!isAcceptedPDPA()){
-                                    Timestamp createdDate = DateTime.getTimeStampNow();        
-                                    SmsGatewayData smsMisMatchConditionGw = new SmsGatewayData();
-                                    smsMisMatchConditionGw.setPhoneNumber(receivedData.getMsisdn());
-                                    smsMisMatchConditionGw.setOrderType(receivedData.getOrderType().toUpperCase());
-                                    smsMisMatchConditionGw.setIs_Status(2);
-                                    smsMisMatchConditionGw.setPayloadMQ(messageMq);
-                                    smsMisMatchConditionGw.setReceive_date(receiveDate);
-                                    smsMisMatchConditionGw.setTransaction_id(getTransactionID(createdDate));
-                                    smsMisMatchConditionGw.setRemark("not accept pdpa OrderType "+receivedData.getOrderType());
-                                    smsMisMatchConditionGw.setCreated_Date(createdDate);
-                                    smsGatewayService.createConditionalMessage(smsMisMatchConditionGw);
-                                    return;
-                                }
-                                isAcceptPDPACheck = true;
+                            // Check PDPA
+                            if (!pdpaService.isPDPASendSMS(condition)){
+                                Timestamp createdDate = DateTime.getTimeStampNow();        
+                                SmsGatewayData smsMisMatchConditionGw = new SmsGatewayData();
+                                smsMisMatchConditionGw.setPhoneNumber(receivedData.getMsisdn());
+                                smsMisMatchConditionGw.setOrderType(receivedData.getOrderType().toUpperCase());
+                                smsMisMatchConditionGw.setIs_Status(4);
+                                smsMisMatchConditionGw.setPayloadMQ(messageMq);
+                                smsMisMatchConditionGw.setReceive_date(receiveDate);
+                                smsMisMatchConditionGw.setTransaction_id(getTransactionID(createdDate));
+                                smsMisMatchConditionGw.setRemark("not accept pdpa send sms OrderType "+receivedData.getOrderType());
+                                smsMisMatchConditionGw.setCreated_Date(createdDate);
+                                smsGatewayService.createConditionalMessage(smsMisMatchConditionGw);
+                                return;
                             }
                             
                             String conditionMessage = condition.getMessage();
                             String smsMessage = MapString.mapPatternToSmsMessage(conditionMessage, jsonData);
                             SmsGatewayData smsMatchConditionGw = new SmsGatewayData();
-                            Timestamp createdDate = DateTime.getTimeStampNow(); 
+                            Timestamp createdDate = DateTime.getTimeStampNow();
+                            String systemTransRef = getTransactionID(createdDate);
                             smsMatchConditionGw.setSMSMessage(smsMessage);
                             // System.out.println("condition.getConditionsID: " + condition.getConditionsID() );
                             smsMatchConditionGw.setConfig_conditions_ID(condition.getConditions_ID());
@@ -138,7 +139,7 @@ public class KafkaConsumerService {
                             smsMatchConditionGw.setOrder_type_MainID(orderTypeData.getMainID());
                             smsMatchConditionGw.setPayloadMQ(messageMq);
                             smsMatchConditionGw.setReceive_date(receiveDate);
-                            smsMatchConditionGw.setTransaction_id(getTransactionID(createdDate));
+                            smsMatchConditionGw.setTransaction_id(systemTransRef);
                             smsMatchConditionGw.setCreated_Date(createdDate);
                             smsMatchConditionGw = smsGatewayService.createConditionalMessage(smsMatchConditionGw);
                             // System.out.println("smsMessage: " + smsMessage + " to phone " + receivedData.getMsisdn() );
@@ -147,7 +148,6 @@ public class KafkaConsumerService {
                             for (int sendSmsCount = 1; sendSmsCount <= MaxRetrySendSmsCount ; sendSmsCount++) {
                                 try{
                                     DataSmsMessage smsData = new DataSmsMessage();
-                                    String systemTransRef = UUID.randomUUID().toString();
                                     smsData.setMessage(smsMessage);
                                     smsData.setSystemTransRef(systemTransRef);
                                     smsData.setTarget(receivedData.getMsisdn());
@@ -221,10 +221,6 @@ public class KafkaConsumerService {
             }
         
         }
-    }
-
-    private boolean isAcceptedPDPA(){
-        return true;
     }
 }
 

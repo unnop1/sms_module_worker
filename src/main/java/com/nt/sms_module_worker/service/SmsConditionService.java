@@ -9,7 +9,6 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import org.apache.kafka.common.protocol.types.Field.Bool;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import java.util.List;
@@ -25,7 +24,6 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 // import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nt.sms_module_worker.model.dto.SmsConditionData;
-import com.nt.sms_module_worker.model.dto.SmsGatewayData;
 import com.nt.sms_module_worker.model.dto.distribute.ReceivedData;
 import com.nt.sms_module_worker.model.dto.distribute.SendSmsGatewayData;
 import com.nt.sms_module_worker.util.Condition;
@@ -103,6 +101,10 @@ public class SmsConditionService {
                 smsConditionData.setIs_delete(rs.getInt("is_delete"));
                 smsConditionData.setIs_delete_By(rs.getString("is_delete_By"));
                 smsConditionData.setIs_delete_Date(rs.getTimestamp("is_delete_Date"));
+                smsConditionData.setTime_Start(rs.getString("time_Start"));
+                smsConditionData.setTime_End(rs.getString("time_End"));
+                smsConditionData.setIs_pdpa(rs.getInt("is_pdpa"));
+                smsConditionData.setIs_period_time(rs.getInt("is_period_time"));
                 
                 conditionDataList.add(smsConditionData);
             }

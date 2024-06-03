@@ -5,6 +5,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -86,6 +87,25 @@ public class DateTime {
             return true; // If parsing succeeds, return true
         } catch (ParseException e) {
             return false; // If parsing fails, return false
+        }
+    }
+
+    public static final Boolean isCurrentTimeInRange(String startInput, String endInput) {
+        // Parse the start and end times
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
+        LocalTime startTime = LocalTime.parse(startInput, formatter);
+        LocalTime endTime = LocalTime.parse(endInput, formatter);
+
+        // Get the current time
+        LocalTime now = LocalTime.now();
+
+        // Check if the current time is within the range
+        if (startTime.isBefore(endTime)) {
+            // If start time is before end time (normal case)
+            return now.isAfter(startTime) && now.isBefore(endTime);
+        } else {
+            // If start time is after end time (range spans midnight)
+            return now.isAfter(startTime) || now.isBefore(endTime);
         }
     }
 }

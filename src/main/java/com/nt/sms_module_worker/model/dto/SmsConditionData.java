@@ -26,5 +26,8 @@ public class SmsConditionData {
     private Integer is_delete=0;
     private String is_delete_By = null;
     private Timestamp is_delete_Date = null;
-
+    private Integer is_pdpa=null;
+    private Integer is_period_time=null;
+    private String time_Start=null;
+    private String time_End=null;
 }

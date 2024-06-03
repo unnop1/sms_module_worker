@@ -1,8 +1,6 @@
 package com.nt.sms_module_worker.model.dto;
 
 
-import java.sql.Date;
-import java.sql.Time;
 import java.sql.Timestamp;
 
 import lombok.Getter;
