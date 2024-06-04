@@ -3,6 +3,7 @@ package com.nt.sms_module_worker.service;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import com.nt.sms_module_worker.entity.ConfigConditionsEntity;
 import com.nt.sms_module_worker.model.dto.SmsConditionData;
 import com.nt.sms_module_worker.util.DateTime;
 
@@ -15,7 +16,7 @@ public class PDPAService {
     @Value("${pdpa.is-skip-pdpa}")
     private Boolean isSkipPDPA = false;
 
-    public boolean isPDPASendSMS(SmsConditionData condition){
+    public boolean isPDPASendSMS(ConfigConditionsEntity condition){
         if(isSkipPDPA){
             return true;
         } 
