@@ -20,6 +20,7 @@ import com.nt.sms_module_worker.entity.OrderTypeEntity;
 import com.nt.sms_module_worker.entity.SmsGatewayEntity;
 import com.nt.sms_module_worker.model.dto.OrderTypeData;
 
+import java.sql.Clob;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -83,6 +84,7 @@ public class KafkaConsumerService {
         Timestamp receiveDate = DateTime.getTimeStampNow();
         ObjectMapper objectMapper = new ObjectMapper();
         ReceivedData receivedData = objectMapper.readValue(messageMq, ReceivedData.class);
+        Clob messageMqClob = new javax.sql.rowset.serial.SerialClob(messageMq.toCharArray());
 
         OrderTypeEntity orderTypeData = orderTypeService.getOrderType(receivedData.getOrderType().toUpperCase());
         System.out.println("orderTypeData: " + orderTypeData.getOrderTypeName() );
@@ -92,7 +94,7 @@ public class KafkaConsumerService {
             smsMisMatchConditionGw.setPhoneNumber(receivedData.getMsisdn());
             smsMisMatchConditionGw.setOrderType(receivedData.getOrderType().toUpperCase());
             smsMisMatchConditionGw.setIs_Status(2);
-            smsMisMatchConditionGw.setPayloadMQ(messageMq);
+            smsMisMatchConditionGw.setPayloadMQ(messageMqClob);
             smsMisMatchConditionGw.setReceive_Date(receiveDate);
             smsMisMatchConditionGw.setTransaction_id(getTransactionID(createdDate));
             smsMisMatchConditionGw.setRemark("ไม่พบ OrderType "+receivedData.getOrderType());
@@ -119,7 +121,7 @@ public class KafkaConsumerService {
                                 smsMisMatchConditionGw.setPhoneNumber(receivedData.getMsisdn());
                                 smsMisMatchConditionGw.setOrderType(receivedData.getOrderType().toUpperCase());
                                 smsMisMatchConditionGw.setIs_Status(4);
-                                smsMisMatchConditionGw.setPayloadMQ(messageMq);
+                                smsMisMatchConditionGw.setPayloadMQ(messageMqClob);
                                 smsMisMatchConditionGw.setReceive_Date(receiveDate);
                                 smsMisMatchConditionGw.setTransaction_id(getTransactionID(createdDate));
                                 smsMisMatchConditionGw.setRemark("not accept pdpa send sms OrderType "+receivedData.getOrderType());
@@ -140,7 +142,7 @@ public class KafkaConsumerService {
                             smsMatchConditionGw.setIs_Status(0);
                             smsMatchConditionGw.setOrderType(receivedData.getOrderType().toUpperCase());
                             smsMatchConditionGw.setOrder_type_mainID(orderTypeData.getMainID());
-                            smsMatchConditionGw.setPayloadMQ(messageMq);
+                            smsMatchConditionGw.setPayloadMQ(messageMqClob);
                             smsMatchConditionGw.setReceive_Date(receiveDate);
                             smsMatchConditionGw.setTransaction_id(systemTransRef);
                             smsMatchConditionGw.setCreated_Date(createdDate);
@@ -187,7 +189,7 @@ public class KafkaConsumerService {
                             smsMisMatchConditionGw.setOrderType(receivedData.getOrderType().toUpperCase());
                             smsMisMatchConditionGw.setOrder_type_mainID(orderTypeData.getMainID());
                             smsMisMatchConditionGw.setIs_Status(2);
-                            smsMisMatchConditionGw.setPayloadMQ(messageMq);
+                            smsMisMatchConditionGw.setPayloadMQ(messageMqClob);
                             smsMisMatchConditionGw.setReceive_Date(receiveDate);
                             smsMisMatchConditionGw.setTransaction_id(getTransactionID(createdDate));
                             smsMisMatchConditionGw.setCreated_Date(createdDate);
@@ -203,7 +205,7 @@ public class KafkaConsumerService {
                     smsMisMatchConditionGw.setOrder_type_mainID(orderTypeData.getMainID());
                     smsMisMatchConditionGw.setIs_Status(2);
                     smsMisMatchConditionGw.setTransaction_id(getTransactionID(createdDate));
-                    smsMisMatchConditionGw.setPayloadMQ(messageMq);
+                    smsMisMatchConditionGw.setPayloadMQ(messageMqClob);
                     smsMisMatchConditionGw.setReceive_Date(receiveDate);
                     smsMisMatchConditionGw.setCreated_Date(createdDate);
                     smsGatewayService.createConditionalMessage(smsMisMatchConditionGw);
@@ -215,7 +217,7 @@ public class KafkaConsumerService {
                 smsNotEnableConditionGw.setOrderType(receivedData.getOrderType().toUpperCase());
                 smsNotEnableConditionGw.setIs_Status(2);
                 smsNotEnableConditionGw.setTransaction_id(getTransactionID(createdDate));
-                smsNotEnableConditionGw.setPayloadMQ(messageMq);
+                smsNotEnableConditionGw.setPayloadMQ(messageMqClob);
                 smsNotEnableConditionGw.setReceive_Date(receiveDate);
                 smsNotEnableConditionGw.setCreated_Date(createdDate);
                 smsNotEnableConditionGw.setRemark("OrderType "+orderTypeData.getOrderTypeName()+" ถูกปิด");

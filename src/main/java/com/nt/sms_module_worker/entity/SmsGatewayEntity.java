@@ -1,6 +1,7 @@
 package com.nt.sms_module_worker.entity;
 
 
+import java.sql.Clob;
 import java.sql.Timestamp;
 
 import jakarta.persistence.Column;
@@ -22,7 +23,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-@Table (name = "sms_gateway")
+@Table (name = "sms_gateway", schema="reddbsms")
 public class SmsGatewayEntity {
         
         @Id
@@ -50,10 +51,10 @@ public class SmsGatewayEntity {
         private String PhoneNumber = null;
 
         @Column(name = "payloadGW", unique = false,nullable = true)
-        private String OfferingId = null;
+        private Clob payloadGW = null;
 
         @Column(name = "PayloadMQ", unique = false,nullable = true)
-        private String PayloadMQ = null;
+        private Clob PayloadMQ = null;
 
         @Column(name = "Is_Status", unique = false,nullable = true)
         private Integer Is_Status = 0;

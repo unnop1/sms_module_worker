@@ -16,7 +16,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-@Table (name = "config_conditions")
+@Table (name = "config_conditions", schema="reddbsms")
 public class ConfigConditionsEntity {
         
         @Id
@@ -74,10 +74,10 @@ public class ConfigConditionsEntity {
         private Timestamp is_Delete_Date = null;
 
         @Column(name = "conditions_or_select", unique = false,nullable = true)
-        private String conditions_or_select = null;
+        private Clob conditions_or_select = null;
 
         @Column(name = "conditions_and_select", unique = false,nullable = true)
-        private String conditions_and_select = null;
+        private Clob conditions_and_select = null;
 
         @Column(name = "is_pdpa", unique = false,nullable = true)
         private Integer is_pdpa=null;

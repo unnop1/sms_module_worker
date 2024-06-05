@@ -14,13 +14,10 @@ import lombok.Getter;
 public class PDPAService {
 
     @Value("${pdpa.is-skip-pdpa}")
-    private Boolean isSkipPDPA = false;
+    private Boolean isSkipCheckPDPA = false;
 
     public boolean isPDPASendSMS(ConfigConditionsEntity condition){
-        if(isSkipPDPA){
-            return true;
-        } 
-        else if (condition.getIs_pdpa().equals(0)){
+        if(isSkipCheckPDPA || condition.getIs_pdpa().equals(0)){
             return true;
         }
         else{

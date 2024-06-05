@@ -17,11 +17,11 @@ public interface SmsConditionRepo extends JpaRepository<ConfigConditionsEntity,L
     @Query(value = """
         SELECT * FROM  config_conditions
         WHERE is_enable = 1
-        AND ( orderType =:order_type OR orderType IS NULL )
+        AND ( orderType =:orderType OR orderType IS NULL )
         AND ( date_Start <= :start_time OR date_Start IS NULL )
        AND ( date_End >= :end_time  OR date_End IS NULL ) 
        """, nativeQuery = true)
-    public List<ConfigConditionsEntity> findSmsCondition(@Param(value = "order_type")String orderType, @Param(value = "start_time")Timestamp startTime, @Param(value = "end_time")Timestamp edTime);
+    public List<ConfigConditionsEntity> findSmsCondition(@Param(value = "orderType")String orderType, @Param(value = "start_time")Timestamp startTime, @Param(value = "end_time")Timestamp edTime);
 
     
 }
