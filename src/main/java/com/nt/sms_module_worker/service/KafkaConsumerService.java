@@ -113,12 +113,11 @@ public class KafkaConsumerService {
                 if (smsConditions.size() > 0) {    
                     // send sms
                     Boolean isCheckedPDPA = false;
-                    ConsentResp consentPDPA;                
+                    ConsentResp consentPDPA = null;                
                     for (ConfigConditionsEntity condition : smsConditions) {
                         JSONObject jsonData = new JSONObject(messageMq);
                         if (smsConditionService.checkSendSms(condition, jsonData)){
                             // Check PDPA
-                            Boolean isAcceptPDPA = true;
                             String conditionMessage = condition.getMessage();
                             String smsMessage = MapString.mapPatternToSmsMessage(conditionMessage, jsonData);
                             SmsGatewayEntity smsMatchConditionGw = new SmsGatewayEntity();
@@ -130,18 +129,30 @@ public class KafkaConsumerService {
                                 Boolean mustCheckPDPA = pdpaService.mustCheckPDPA(condition);
                                 isCheckedPDPA = true;
                                 if (!mustCheckPDPA){
-                                    consentPDPA = pdpaService.getPDPAConsent(phoneNumber);
+                                    consentPDPA = pdpaService.getPDPAConsent(receivedData.getMsisdn());
                                 }
                             }
-                            /////////////////
-                            // your code here check pdpa purposes
-                            /////////////////
-
-
+                            
+                            if(consentPDPA != null){
+                                if(!consentPDPA.getHaveConsent()){
+                                    createdDate = DateTime.getTimeStampNow(); 
+                                    SmsGatewayEntity smsNotEnableConditionGw = new SmsGatewayEntity();
+                                    smsNotEnableConditionGw.setPhoneNumber(receivedData.getMsisdn());
+                                    smsNotEnableConditionGw.setOrderType(receivedData.getOrderType().toUpperCase());
+                                    smsNotEnableConditionGw.setIs_Status(4);
+                                    smsNotEnableConditionGw.setTransaction_id(getTransactionID(createdDate));
+                                    smsNotEnableConditionGw.setPayloadMQ(messageMqClob);
+                                    smsNotEnableConditionGw.setReceive_Date(receiveDate);
+                                    smsNotEnableConditionGw.setCreated_Date(createdDate);
+                                    smsNotEnableConditionGw.setRemark("ไม่ยอมรับ pdpa กับ orderType : "+orderTypeData.getOrderTypeName());
+                                    smsGatewayService.createConditionalMessage(smsNotEnableConditionGw);
+                                    return;
+                                }
+                            }
                             smsMatchConditionGw.setSMSMessage(smsMessage);
                             // System.out.println("condition.getConditionsID: " + condition.getConditionsID() );
                             smsMatchConditionGw.setConfig_conditions_ID(condition.getConditionsID());
-                            smsMatchConditionGw.setPhoneNumber(phoneNumber);
+                            smsMatchConditionGw.setPhoneNumber(receivedData.getMsisdn());
                             smsMatchConditionGw.setIs_Status(0);
                             smsMatchConditionGw.setOrderType(receivedData.getOrderType().toUpperCase());
                             smsMatchConditionGw.setOrder_type_mainID(orderTypeData.getMainID());

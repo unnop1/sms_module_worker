@@ -39,7 +39,7 @@ public class PDPAService {
     }
 
     public ConsentResp getPDPAConsent(String phoneNumber){
-        ConsentResp resp = client.GetListConsentPDPAByPhoneNumber(consentID, phoneNumber);
+        ConsentResp resp = client.GetConsentPDPAByPhoneNumber(phoneNumber);
         return resp;
     }
     

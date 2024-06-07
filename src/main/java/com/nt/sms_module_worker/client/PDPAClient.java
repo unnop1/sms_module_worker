@@ -64,13 +64,12 @@ public class PDPAClient {
     }
 
 
-    public ConsentResp GetListConsentPDPAByPhoneNumber(String consentID, String phoneNumber){
+    public ConsentResp GetConsentPDPAByPhoneNumber(String phoneNumber){
         ConsentResp respData = null;
         try {
             URL url = new URL(String.format(
-                    "http://%s/portal/sdk/%s/datasubject?identify=%s",
+                    "http://%s/portal/sdk/b418204c-ab26-11ee-ae53-9eee6c3a4940/datasubject?identify=%s",
                     host,
-                    consentID,
                     phoneNumber
                 )
             );
