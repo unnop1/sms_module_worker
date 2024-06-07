@@ -110,8 +110,13 @@ public class MapString {
 
         return message;
 
+    }
 
-
+    public static String removeLeadingZero(String input) {
+        if (input != null && input.startsWith("0")) {
+            return input.substring(1);
+        }
+        return input;
     }
 
 
