@@ -16,11 +16,11 @@ import lombok.Getter;
 @Getter
 public class PDPAService {
 
-    @Autowired
     private PDPAClient client;
 
-    @Value("${pdpa.consent_id}")
-    private String consentID = "xxxxxxxxxxxxxxxxxxxxxxxx";
+    public PDPAService(@Value("${pdpa.host}") String host) {
+        client = new PDPAClient(host);
+    }
     
     public boolean mustCheckPDPA(ConfigConditionsEntity condition){
         if(condition.getIs_pdpa().equals(0)){
