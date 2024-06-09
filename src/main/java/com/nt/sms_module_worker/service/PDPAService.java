@@ -16,6 +16,9 @@ import lombok.Getter;
 @Getter
 public class PDPAService {
 
+    @Value("${pdpa.is-skip-pdpa}")
+    private boolean isSkipCheckPDPA;
+
     private PDPAClient client;
 
     public PDPAService(@Value("${pdpa.host}") String host) {
@@ -23,7 +26,7 @@ public class PDPAService {
     }
     
     public boolean mustCheckPDPA(ConfigConditionsEntity condition){
-        if(condition.getIs_pdpa().equals(0)){
+        if(condition.getIs_pdpa().equals(0) || isSkipCheckPDPA){
             return false; // Skip check PDPA
         }
         else{
