@@ -16,7 +16,7 @@ public class CustomPhysicalNamingStrategy extends CamelCaseToUnderscoresNamingSt
         if (identifier != null) {
             String name = identifier.getText();
             if (name.toLowerCase().equals("${replace_schema}")) {
-                String schema = schemaName;
+                String schema = schemaName.toUpperCase();
                 return super.toPhysicalSchemaName(new Identifier(schema, identifier.isQuoted()), jdbcEnvironment);
             }
         }
