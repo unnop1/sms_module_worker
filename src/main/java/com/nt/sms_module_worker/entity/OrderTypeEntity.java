@@ -16,7 +16,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-@Table (name = "order_type", schema="#{SchemaConfiguration.schema}")
+@Table (name = "order_type", schema="${replace_schema}")
 public class OrderTypeEntity {
         
         @Id

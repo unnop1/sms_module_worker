@@ -23,7 +23,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-@Table (name = "sms_gateway", schema="#{SchemaConfiguration.schema}")
+@Table (name = "sms_gateway", schema="${replace_schema}")
 public class SmsGatewayEntity {
         
         @Id

@@ -15,7 +15,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-@Table (name = "config_conditions", schema="#{SchemaConfiguration.schema}")//"reddbsms"
+@Table (name = "config_conditions", schema="${replace_schema}")//"reddbsms"
 public class ConfigConditionsEntity {
         
         @Id

@@ -12,7 +12,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-@Table (name = "FIXED_PHONENUMBER", schema="#{SchemaConfiguration.schema}")
+@Table (name = "FIXED_PHONENUMBER", schema="${replace_schema}")
 public class FixedPhoneNumberEntity {
         
         @Id
