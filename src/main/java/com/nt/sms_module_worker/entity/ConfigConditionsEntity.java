@@ -21,22 +21,22 @@ public class ConfigConditionsEntity {
         @Id
         @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "config_conditions_seq")
         @SequenceGenerator(name = "config_conditions_seq", allocationSize = 1)
-        @Column(name = "conditions_ID")
+        @Column(name = "CONDITIONS_ID")
         private Long conditionsID;
 
         @Column(name = "order_type_MainID", unique = false,nullable = true)
         private Long order_type_MainID = null;
         
-        @Column(name = "orderType", unique = false,nullable = true)
+        @Column(name = "ORDERTYPE", unique = false,nullable = true)
         private String orderType = null;
 
-        @Column(name = "refID", unique = false,nullable = true)
+        @Column(name = "REFID", unique = false,nullable = true)
         private String refID = null;
 
-        @Column(name = "date_Start", unique = false,nullable = true)
+        @Column(name = "DATE_START", unique = false,nullable = true)
         private Timestamp date_Start = null;
 
-        @Column(name = "date_End", unique = false,nullable = true)
+        @Column(name = "DATE_END", unique = false,nullable = true)
         private Timestamp date_End = null;
 
         @Column(name = "message", unique = false,nullable = true)
