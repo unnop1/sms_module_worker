@@ -27,6 +27,9 @@
 /Users/devcg/project/arx/nt-telecom/sms_module_worker/src/main/java/com/nt/sms_module_worker/model/dto/config_conditions/EventItem.java
 /Users/devcg/project/arx/nt-telecom/sms_module_worker/src/main/java/com/nt/sms_module_worker/model/dto/distribute/Offer.java
 /Users/devcg/project/arx/nt-telecom/sms_module_worker/src/main/java/com/nt/sms_module_worker/SmsModuleWorkerApplication.java
+/Users/devcg/project/arx/nt-telecom/sms_module_worker/src/main/java/com/nt/sms_module_worker/service/FixedPhoneService.java
+/Users/devcg/project/arx/nt-telecom/sms_module_worker/src/main/java/com/nt/sms_module_worker/repo/FixedPhoneRepo.java
+/Users/devcg/project/arx/nt-telecom/sms_module_worker/src/main/java/com/nt/sms_module_worker/entity/FixedPhoneNumberEntity.java
 /Users/devcg/project/arx/nt-telecom/sms_module_worker/src/main/java/com/nt/sms_module_worker/model/dto/distribute/EventData.java
 /Users/devcg/project/arx/nt-telecom/sms_module_worker/src/main/java/com/nt/sms_module_worker/model/dto/SmsConditionData.java
 /Users/devcg/project/arx/nt-telecom/sms_module_worker/src/main/java/com/nt/sms_module_worker/model/dto/distribute/EventItem.java
@@ -34,4 +37,5 @@
 /Users/devcg/project/arx/nt-telecom/sms_module_worker/src/main/java/com/nt/sms_module_worker/entity/ConfigConditionsEntity.java
 /Users/devcg/project/arx/nt-telecom/sms_module_worker/src/main/java/com/nt/sms_module_worker/model/dto/config_conditions/Offer.java
 /Users/devcg/project/arx/nt-telecom/sms_module_worker/src/main/java/com/nt/sms_module_worker/repo/OrderTypeRepo.java
+/Users/devcg/project/arx/nt-telecom/sms_module_worker/src/main/java/com/nt/sms_module_worker/config/SchemaConfiguration.java
 /Users/devcg/project/arx/nt-telecom/sms_module_worker/src/main/java/com/nt/sms_module_worker/controller/HomeController.java
