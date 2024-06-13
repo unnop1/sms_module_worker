@@ -19,6 +19,6 @@ public class FixedPhoneNumberEntity {
         @Column(name = "ID")
         private Long ID;
 
-        @Column(name = "PHONE_NUMBER", unique = false,nullable = true)
+        @Column(name = "PHONENUMBER", unique = false,nullable = true)
         private String phoneNumber = null;
 }
