@@ -31,12 +31,16 @@ import java.util.Map;
 
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.annotation.EnableKafka;
     
 // Method 
 @EnableKafka
 @Component
 public class KafkaConsumerService {
+
+    @Value("${smsgateway.is_skip_send}")
+    private boolean isSkipSendSms=false;
 
     private final Integer MaxRetrySendSmsCount = 3;  
 
@@ -52,6 +56,9 @@ public class KafkaConsumerService {
     @Autowired
     private SmsGatewayService smsGatewayService;
 
+    @Autowired
+    private FixedPhoneService fixedPhoneService;
+    
     @KafkaListener(
         autoStartup="true",
         // {"orderType": "new", "payload":"123"}
@@ -113,7 +120,16 @@ public class KafkaConsumerService {
                 if (smsConditions.size() > 0) {    
                     // send sms
                     Boolean isCheckedPDPA = false;
-                    ConsentResp consentPDPA = null;                
+                    ConsentResp consentPDPA = null;
+                    List<String> phoneNumberSendSms = new ArrayList<String>(); 
+                    List<String> fixedPhoneNumbers = fixedPhoneService.GetAllFixPhoneNumber();    
+                    String phoneNumber = String.format("66%s", MapString.removeLeadingZero(receivedData.getMsisdn()));
+
+                    if (fixedPhoneNumbers.size()>0){
+                        phoneNumberSendSms.addAll(fixedPhoneNumbers);
+                    }else{
+                        phoneNumberSendSms.add(phoneNumber);
+                    }
                     for (ConfigConditionsEntity condition : smsConditions) {
                         JSONObject jsonData = new JSONObject(messageMq);
                         if (smsConditionService.checkSendSms(condition, jsonData)){
@@ -123,8 +139,7 @@ public class KafkaConsumerService {
                             SmsGatewayEntity smsMatchConditionGw = new SmsGatewayEntity();
                             Timestamp createdDate = DateTime.getTimeStampNow();
                             String systemTransRef = getTransactionID(createdDate);
-                            String phoneNumber = String.format("66%s", MapString.removeLeadingZero(receivedData.getMsisdn()));
-
+                            
                             if (!isCheckedPDPA){
                                 Boolean mustCheckPDPA = pdpaService.mustCheckPDPA(condition);
                                 isCheckedPDPA = true;
@@ -164,30 +179,35 @@ public class KafkaConsumerService {
                             // System.out.println("smsMessage: " + smsMessage + " to phone " + receivedData.getMsisdn() );
                             
                             
-                            for (int sendSmsCount = 1; sendSmsCount <= MaxRetrySendSmsCount ; sendSmsCount++) {
-                                try{
-                                    DataSmsMessage smsData = new DataSmsMessage();
-                                    smsData.setMessage(smsMessage);
-                                    smsData.setSystemTransRef(systemTransRef);
-                                    smsData.setTarget(phoneNumber);
-                                    smsData.setSource("my");
-                                    smsData.setRequestDate(DateTime.getRequestDateUtcNow());
-                                    List<DataSmsMessage> smsMessages = new ArrayList<>();
-                                    smsMessages.add(smsData);
-                                    
-                                    SendSmsGatewayData sendSmsData = new SendSmsGatewayData();
-                                    sendSmsData.setBulkRef("BulkTest-e9bfae24-82c5-11ee-b962-0242ac120002");
-                                    sendSmsData.setMessages(smsMessages);
-                                    smsConditionService.publish("RtcSmsBatchEx","" , sendSmsData);
-                                    break;
-                                }catch (Exception e){
-                                    if (sendSmsCount >= MaxRetrySendSmsCount){
-                                        SmsGatewayEntity updateInfo = new SmsGatewayEntity();
-                                        updateInfo.setIs_Status(3);
-                                        smsGatewayService.updateConditionalMessageById(smsMatchConditionGw.getGID(), updateInfo);
-                                        return;
+                            // Message to send sms message
+                            List<DataSmsMessage> smsMessages = new ArrayList<>();
+                            for (int i = 0; i < phoneNumberSendSms.size();i++){
+                                DataSmsMessage smsData = new DataSmsMessage();
+                                smsData.setMessage(smsMessage);
+                                smsData.setSystemTransRef(systemTransRef);
+                                smsData.setTarget(phoneNumber);
+                                smsData.setSource("my");
+                                smsData.setRequestDate(DateTime.getRequestDateUtcNow());
+                                smsMessages.add(smsData);
+                            }
+
+                            if(!isSkipSendSms){
+                                for (int sendSmsCount = 1; sendSmsCount <= MaxRetrySendSmsCount ; sendSmsCount++) {
+                                    try{
+                                        SendSmsGatewayData sendSmsData = new SendSmsGatewayData();
+                                        sendSmsData.setBulkRef("BulkTest-e9bfae24-82c5-11ee-b962-0242ac120002");
+                                        sendSmsData.setMessages(smsMessages);
+                                        smsConditionService.publish("RtcSmsBatchEx","" , sendSmsData);
+                                        break;
+                                    }catch (Exception e){
+                                        if (sendSmsCount >= MaxRetrySendSmsCount){
+                                            SmsGatewayEntity updateInfo = new SmsGatewayEntity();
+                                            updateInfo.setIs_Status(3);
+                                            smsGatewayService.updateConditionalMessageById(smsMatchConditionGw.getGID(), updateInfo);
+                                            return;
+                                        }
+                                        System.out.println("Error round "+sendSmsCount+" publishing: " + e.getMessage());
                                     }
-                                    System.out.println("Error round "+sendSmsCount+" publishing: " + e.getMessage());
                                 }
                             }
                             Timestamp sendDate = DateTime.getTimeStampNow(); 
