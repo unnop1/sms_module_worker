@@ -4,6 +4,8 @@ package com.nt.sms_module_worker.entity;
 import java.sql.Clob;
 import java.sql.Timestamp;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -42,9 +44,11 @@ public class ConfigConditionsEntity {
         @Column(name = "message", unique = false,nullable = true)
         private String message = null;
 
+        @JsonBackReference
         @Column(name = "conditions_or", unique = false,nullable = true)
         private Clob conditions_or = null;
 
+        @JsonBackReference
         @Column(name = "conditions_and", unique = false,nullable = true)
         private Clob conditions_and = null;
 
@@ -72,9 +76,11 @@ public class ConfigConditionsEntity {
         @Column(name = "is_Delete_Date", unique = false,nullable = true)
         private Timestamp is_Delete_Date = null;
 
+        @JsonBackReference
         @Column(name = "conditions_or_select", unique = false,nullable = true)
         private Clob conditions_or_select = null;
 
+        @JsonBackReference
         @Column(name = "conditions_and_select", unique = false,nullable = true)
         private Clob conditions_and_select = null;
 
