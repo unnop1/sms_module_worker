@@ -10,6 +10,4 @@ import org.springframework.data.jpa.repository.Query;
 
 public interface FixedPhoneRepo extends JpaRepository<FixedPhoneNumberEntity,Long> {
 
-    @Query("SELECT * FROM fixed_phonenumber")
-    List<FixedPhoneNumberEntity> findAllPhoneNumbers();
 }

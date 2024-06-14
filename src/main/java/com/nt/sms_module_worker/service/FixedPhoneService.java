@@ -17,7 +17,7 @@ class FixedPhoneService {
     private FixedPhoneRepo fixedPhoneRepo;
 
     public List<FixedPhoneNumberEntity> GetAllFixPhoneNumber() throws SQLException {
-        return fixedPhoneRepo.findAllPhoneNumbers();
+        return fixedPhoneRepo.findAll();
     }
 
 }
