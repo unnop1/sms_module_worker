@@ -28,7 +28,7 @@ public class OrderTypeEntity {
         @Column(name = "MAINID", unique = false,nullable = true)
         private Long MainID = null;
 
-        @Column(name = "ODERTYPE_NAME", unique = false,nullable = true)
+        @Column(name = "ORDERTYPE_NAME", unique = false,nullable = true)
         private String OrderTypeName = null;
 
         @Column(name = "IS_ENABLE", unique = false,nullable = true)
