@@ -25,27 +25,27 @@ public class OrderTypeEntity {
         @Column(name = "TYPEID")
         private Long TYPEID = null;
 
-        @Column(name = "MainID", unique = false,nullable = true)
+        @Column(name = "MAINID", unique = false,nullable = true)
         private Long MainID = null;
 
-        @Column(name = "OrderType_Name", unique = false,nullable = true)
+        @Column(name = "ODERTYPE_NAME", unique = false,nullable = true)
         private String OrderTypeName = null;
 
-        @Column(name = "Is_Enable", unique = false,nullable = true)
+        @Column(name = "IS_ENABLE", unique = false,nullable = true)
         private Integer IsEnable = 1;
 
-        @Column(name = "Is_Delete", unique = false,nullable = true)
+        @Column(name = "IS_DELETE", unique = false,nullable = true)
         private Integer IsDelete = 0;
 
-        @Column(name = "Created_Date", unique = false,nullable = true)
+        @Column(name = "CREATED_DATE", unique = false,nullable = true)
         private Timestamp CreatedDate = null;
 
-        @Column(name = "Created_By", unique = false,nullable = true)
+        @Column(name = "CREATED_BY", unique = false,nullable = true)
         private String CreatedBy = null;
 
-        @Column(name = "Updated_Date", unique = false,nullable = true)
+        @Column(name = "UPDATED_DATE", unique = false,nullable = true)
         private Timestamp UpdatedDate = null;
 
-        @Column(name = "Updated_By", unique = false,nullable = true)
+        @Column(name = "UPDATED_BY", unique = false,nullable = true)
         private String Updated_By = null;
 }
