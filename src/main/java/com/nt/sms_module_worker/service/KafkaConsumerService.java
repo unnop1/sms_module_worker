@@ -66,7 +66,27 @@ public class KafkaConsumerService {
             // Process the message based on the queue name
             // System.out.println("isSkipPDPA:"+ pdpaService.getIsSkipPDPA());
             processOrderType(message);
-        } catch (Exception e) {
+        }catch (SQLException sqle) {
+            Timestamp receiveDate = DateTime.getTimeStampNow();
+            Clob messageMqClob = new javax.sql.rowset.serial.SerialClob(message.toCharArray());
+            SmsGatewayEntity smsGwError = new SmsGatewayEntity();
+            smsGwError.setIs_Status(2);
+            smsGwError.setPayloadMQ(messageMqClob);
+            smsGwError.setReceive_Date(receiveDate);
+            smsGwError.setRemark("sql error : "+sqle.getMessage());
+            smsGwError.setCreated_Date(receiveDate);
+            smsGatewayService.createConditionalMessage(smsGwError);
+            sqle.printStackTrace();
+        }catch (Exception e) {
+            Timestamp receiveDate = DateTime.getTimeStampNow();
+            Clob messageMqClob = new javax.sql.rowset.serial.SerialClob(message.toCharArray());
+            SmsGatewayEntity smsGwError = new SmsGatewayEntity();
+            smsGwError.setIs_Status(2);
+            smsGwError.setPayloadMQ(messageMqClob);
+            smsGwError.setReceive_Date(receiveDate);
+            smsGwError.setRemark("error : "+e.getMessage());
+            smsGwError.setCreated_Date(receiveDate);
+            smsGatewayService.createConditionalMessage(smsGwError);
             e.printStackTrace();
         }
     }
