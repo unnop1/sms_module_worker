@@ -1,17 +1,10 @@
 package com.nt.sms_module_worker.service;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Map;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.nt.sms_module_worker.entity.ConfigConditionsEntity;
 import com.nt.sms_module_worker.entity.SmsGatewayEntity;
-import com.nt.sms_module_worker.model.dto.SmsGatewayData;
 import com.nt.sms_module_worker.repo.SmsGatewayRepo;
 
 

@@ -1,15 +1,11 @@
 package com.nt.sms_module_worker.service;
 
 import org.springframework.kafka.annotation.KafkaListener;
-import org.springframework.kafka.annotation.TopicPartition;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.kafka.support.KafkaHeaders;
-import org.springframework.stereotype.Service;
 import org.springframework.stereotype.Component;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.nt.sms_module_worker.model.dto.SmsConditionData;
-import com.nt.sms_module_worker.model.dto.SmsGatewayData;
 import com.nt.sms_module_worker.model.dto.distribute.DataSmsMessage;
 import com.nt.sms_module_worker.model.dto.distribute.ReceivedData;
 import com.nt.sms_module_worker.model.dto.distribute.SendSmsGatewayData;
@@ -19,16 +15,11 @@ import com.nt.sms_module_worker.entity.ConfigConditionsEntity;
 import com.nt.sms_module_worker.entity.OrderTypeEntity;
 import com.nt.sms_module_worker.entity.SmsGatewayEntity;
 import com.nt.sms_module_worker.model.dao.pdpa.consent.ConsentResp;
-import com.nt.sms_module_worker.model.dto.OrderTypeData;
-
 import java.sql.Clob;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -180,6 +171,7 @@ public class KafkaConsumerService {
                             
                             
                             // Message to send sms message
+                            SendSmsGatewayData sendSmsData = new SendSmsGatewayData();
                             List<DataSmsMessage> smsMessages = new ArrayList<>();
                             for (int i = 0; i < phoneNumberSendSms.size();i++){
                                 DataSmsMessage smsData = new DataSmsMessage();
@@ -190,13 +182,12 @@ public class KafkaConsumerService {
                                 smsData.setRequestDate(DateTime.getRequestDateUtcNow());
                                 smsMessages.add(smsData);
                             }
+                            sendSmsData.setBulkRef("BulkTest-e9bfae24-82c5-11ee-b962-0242ac120002");
+                            sendSmsData.setMessages(smsMessages);
 
                             if(!isSkipSendSms){
                                 for (int sendSmsCount = 1; sendSmsCount <= MaxRetrySendSmsCount ; sendSmsCount++) {
                                     try{
-                                        SendSmsGatewayData sendSmsData = new SendSmsGatewayData();
-                                        sendSmsData.setBulkRef("BulkTest-e9bfae24-82c5-11ee-b962-0242ac120002");
-                                        sendSmsData.setMessages(smsMessages);
                                         smsConditionService.publish("RtcSmsBatchEx","" , sendSmsData);
                                         break;
                                     }catch (Exception e){

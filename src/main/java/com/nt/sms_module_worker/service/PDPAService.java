@@ -1,13 +1,11 @@
 package com.nt.sms_module_worker.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import com.nt.sms_module_worker.client.PDPAClient;
 import com.nt.sms_module_worker.entity.ConfigConditionsEntity;
 import com.nt.sms_module_worker.model.dao.pdpa.consent.ConsentResp;
-import com.nt.sms_module_worker.model.dto.SmsConditionData;
 import com.nt.sms_module_worker.util.DateTime;
 
 import lombok.Getter;

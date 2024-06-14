@@ -1,13 +1,8 @@
 package com.nt.sms_module_worker.util;
 
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.json.JSONArray;
 import org.json.JSONObject;
-
-import netscape.javascript.JSObject;
 
 public class Condition {
 

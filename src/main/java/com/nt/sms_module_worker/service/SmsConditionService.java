@@ -1,12 +1,8 @@
 package com.nt.sms_module_worker.service;
 
 import java.nio.charset.StandardCharsets;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.json.JSONArray;
@@ -24,9 +20,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nt.sms_module_worker.entity.ConfigConditionsEntity;
-// import com.fasterxml.jackson.databind.ObjectMapper;
-import com.nt.sms_module_worker.model.dto.SmsConditionData;
-import com.nt.sms_module_worker.model.dto.distribute.ReceivedData;
 import com.nt.sms_module_worker.model.dto.distribute.SendSmsGatewayData;
 import com.nt.sms_module_worker.repo.SmsConditionRepo;
 import com.nt.sms_module_worker.util.Condition;
