@@ -12,6 +12,7 @@ import com.nt.sms_module_worker.model.dto.distribute.SendSmsGatewayData;
 import com.nt.sms_module_worker.util.DateTime;
 import com.nt.sms_module_worker.util.MapString;
 import com.nt.sms_module_worker.entity.ConfigConditionsEntity;
+import com.nt.sms_module_worker.entity.FixedPhoneNumberEntity;
 import com.nt.sms_module_worker.entity.OrderTypeEntity;
 import com.nt.sms_module_worker.entity.SmsGatewayEntity;
 import com.nt.sms_module_worker.model.dao.pdpa.consent.ConsentResp;
@@ -113,11 +114,13 @@ public class KafkaConsumerService {
                     Boolean isCheckedPDPA = false;
                     ConsentResp consentPDPA = null;
                     List<String> phoneNumberSendSms = new ArrayList<String>(); 
-                    List<String> fixedPhoneNumbers = fixedPhoneService.GetAllFixPhoneNumber();    
+                    List<FixedPhoneNumberEntity> fixedPhoneNumbers = fixedPhoneService.GetAllFixPhoneNumber();    
                     String phoneNumber = String.format("66%s", MapString.removeLeadingZero(receivedData.getMsisdn()));
 
                     if (fixedPhoneNumbers.size()>0){
-                        phoneNumberSendSms.addAll(fixedPhoneNumbers);
+                        for (FixedPhoneNumberEntity fixedPhoneNumber : fixedPhoneNumbers){
+                            phoneNumberSendSms.add(fixedPhoneNumber.getPhoneNumber());
+                        }
                     }else{
                         phoneNumberSendSms.add(phoneNumber);
                     }
