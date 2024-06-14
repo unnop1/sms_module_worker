@@ -205,6 +205,10 @@ public class KafkaConsumerService {
                                 smsData.setRequestDate(DateTime.getRequestDateUtcNow());
                                 smsMessages.add(smsData);
                             }
+                            objectMapper = new ObjectMapper();
+                            String payloadGwStr = objectMapper.writeValueAsString(messageMq);
+                            Clob payloadGwClob = new javax.sql.rowset.serial.SerialClob(payloadGwStr.toCharArray());
+                            smsMatchConditionGw.setPayloadGW(payloadGwClob);
                             sendSmsData.setBulkRef("BulkTest-e9bfae24-82c5-11ee-b962-0242ac120002");
                             sendSmsData.setMessages(smsMessages);
 
