@@ -61,7 +61,7 @@ public class SmsConditionService {
 
     public List<ConfigConditionsEntity> getListSmsCondition(String orderType) throws SQLException {
         Timestamp currentTime = DateTime.getTimeStampNow();
-        List<ConfigConditionsEntity> conditionDataList = smsConditionRepo.findSmsCondition(orderType, currentTime, currentTime);
+        List<ConfigConditionsEntity> conditionDataList = smsConditionRepo.findSmsCondition(orderType.toUpperCase(), currentTime, currentTime);
         return conditionDataList;
     }
 

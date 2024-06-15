@@ -20,16 +20,19 @@ class SmsGatewayService {
     }
 
     public SmsGatewayEntity createConditionalMessage(SmsGatewayEntity smsGatewayData) throws SQLException {    
-        smsGatewayRepo.save(smsGatewayData);
-        return smsGatewayData;
+        return smsGatewayRepo.saveAndFlush(smsGatewayData);
     }
 
 
     public void updateConditionalMessageById(Long smsGatewayId, SmsGatewayEntity updates) throws SQLException {
-        SmsGatewayEntity existingEntity = smsGatewayRepo.findById(smsGatewayId).orElse(null);
+        SmsGatewayEntity existingEntity = smsGatewayRepo.getSmsGatewayByGID(smsGatewayId);
         if (existingEntity != null) {
             if (updates.getIs_Status() != null){
                 existingEntity.setIs_Status(updates.getIs_Status());
+            }
+
+            if (updates.getRemark() != null){
+                existingEntity.setRemark(updates.getRemark());
             }
 
             if (updates.getSend_Date() != null){

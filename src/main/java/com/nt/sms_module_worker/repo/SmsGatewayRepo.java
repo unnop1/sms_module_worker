@@ -11,5 +11,10 @@ public interface SmsGatewayRepo extends JpaRepository<SmsGatewayEntity,Long> {
                 """
                 , nativeQuery = true)
     public Integer countTotalAllToday();
+
+
+    @Query(value = "SELECT * FROM sms_gateway WHERE  GID=?1"
+                , nativeQuery = true)
+    public SmsGatewayEntity getSmsGatewayByGID(Long gid);
     
 }

@@ -34,7 +34,7 @@ public class KafkaConsumerService {
     @Value("${smsgateway.is_skip_send}")
     private boolean isSkipSendSms=false;
 
-    private final Integer MaxRetrySendSmsCount = 3;  
+    private Integer MaxRetrySendSmsCount = 3;  
 
     @Autowired
     private PDPAService pdpaService;
@@ -55,7 +55,7 @@ public class KafkaConsumerService {
         autoStartup="true",
         // {"orderType": "new", "payload":"123"}
         // topics = {"New", "Suspend", "Reconnect", "Change_Package", "Add_Package", "Delete_Package", "Topup_Recharge", "Package_Expire"}, 
-        topics = {"NEW", "SUSPEND", "RECONNECT", "CHANGE_PACKAGE", "ADD_PACKAGE", "DELETE_PACKAGE", "TOPUP_RCHARGE", "PACKAGE_EXPIRE"}, 
+        topics = {"NEW", "SUSPEND", "RECONNECT", "CHANGEPACKAGE", "ADD_PACKAGE", "DELETE_PACKAGE", "TOPUP_RECHARGE", "PACKAGE_EXPIRE"}, 
         groupId = "sms_module.worker"
     )
     public void listening(@Payload String message, @Header(KafkaHeaders.RECEIVED_TOPIC) String topic) throws Exception {
@@ -147,6 +147,7 @@ public class KafkaConsumerService {
                     for (ConfigConditionsEntity condition : smsConditions) {
                         JSONObject jsonData = new JSONObject(messageMq);
                         if (smsConditionService.checkSendSms(condition, jsonData)){
+                        // if(true){
                             // Check PDPA
                             String conditionMessage = condition.getMessage();
                             String smsMessage = MapString.mapPatternToSmsMessage(conditionMessage, jsonData);
@@ -186,10 +187,11 @@ public class KafkaConsumerService {
                             smsMatchConditionGw.setOrderType(receivedData.getOrderType().toUpperCase());
                             smsMatchConditionGw.setOrder_type_mainID(orderTypeData.getMainID());
                             smsMatchConditionGw.setPayloadMQ(messageMqClob);
+                            smsMatchConditionGw.setRemark("sending sms");
                             smsMatchConditionGw.setReceive_Date(receiveDate);
                             smsMatchConditionGw.setTransaction_id(systemTransRef);
                             smsMatchConditionGw.setCreated_Date(createdDate);
-                            smsMatchConditionGw = smsGatewayService.createConditionalMessage(smsMatchConditionGw);
+                            
                             // System.out.println("smsMessage: " + smsMessage + " to phone " + receivedData.getMsisdn() );
                             
                             
@@ -200,40 +202,51 @@ public class KafkaConsumerService {
                                 DataSmsMessage smsData = new DataSmsMessage();
                                 smsData.setMessage(smsMessage);
                                 smsData.setSystemTransRef(systemTransRef);
-                                smsData.setTarget(phoneNumber);
+                                smsData.setTarget(phoneNumberSendSms.get(i));
                                 smsData.setSource("my");
                                 smsData.setRequestDate(DateTime.getRequestDateUtcNow());
                                 smsMessages.add(smsData);
                             }
-                            objectMapper = new ObjectMapper();
-                            String payloadGwStr = objectMapper.writeValueAsString(messageMq);
-                            Clob payloadGwClob = new javax.sql.rowset.serial.SerialClob(payloadGwStr.toCharArray());
-                            smsMatchConditionGw.setPayloadGW(payloadGwClob);
                             sendSmsData.setBulkRef("BulkTest-e9bfae24-82c5-11ee-b962-0242ac120002");
                             sendSmsData.setMessages(smsMessages);
+                            objectMapper = new ObjectMapper();
+                            String payloadGwStr = objectMapper.writeValueAsString(sendSmsData);
+                            Clob payloadGwClob = new javax.sql.rowset.serial.SerialClob(payloadGwStr.toCharArray());
+                            smsMatchConditionGw.setPayloadGW(payloadGwClob);
+                            
+                            SmsGatewayEntity smsMatchConditionLogGw = smsGatewayService.createConditionalMessage(smsMatchConditionGw);
+                            
+                            // SmsGatewayEntity smsMatchConditiontestlogGw = new SmsGatewayEntity();
+                            // smsMatchConditiontestlogGw.setRemark("GID:"+smsMatchConditionLogGw);
+                            // smsGatewayService.createConditionalMessage(smsMatchConditiontestlogGw);
 
-                            if(!isSkipSendSms){
-                                for (int sendSmsCount = 1; sendSmsCount <= MaxRetrySendSmsCount ; sendSmsCount++) {
-                                    try{
-                                        smsConditionService.publish("RtcSmsBatchEx","" , sendSmsData);
-                                        break;
-                                    }catch (Exception e){
-                                        if (sendSmsCount >= MaxRetrySendSmsCount){
-                                            SmsGatewayEntity updateInfo = new SmsGatewayEntity();
-                                            updateInfo.setIs_Status(3);
-                                            smsGatewayService.updateConditionalMessageById(smsMatchConditionGw.getGID(), updateInfo);
-                                            return;
-                                        }
-                                        System.out.println("Error round "+sendSmsCount+" publishing: " + e.getMessage());
+
+                            for (int sendSmsCount = 1; sendSmsCount <= MaxRetrySendSmsCount ; sendSmsCount++) {
+                                try{
+                                    smsConditionService.publish("RtcSmsBatchEx","" , sendSmsData);
+                                    Timestamp sendDate = DateTime.getTimeStampNow(); 
+                                    SmsGatewayEntity updateInfo = new SmsGatewayEntity();
+                                    updateInfo.setIs_Status(1);
+                                    updateInfo.setRemark("Send sms to gateway successfully");
+                                    updateInfo.setSend_Date(sendDate);
+                                    // System.out.println("smsMatchConditionGw.getGID: " + smsMatchConditionGw.getGID() );
+                                    smsGatewayService.updateConditionalMessageById(smsMatchConditionLogGw.getGID()+1, updateInfo);
+                                }catch (Exception e){
+                                    if (sendSmsCount >= MaxRetrySendSmsCount){
+                                        SmsGatewayEntity updateInfo = new SmsGatewayEntity();
+                                        updateInfo.setIs_Status(3);
+                                        smsGatewayService.updateConditionalMessageById(smsMatchConditionLogGw.getGID()+1, updateInfo);
+                                        return;
                                     }
+                                    SmsGatewayEntity updateInfo = new SmsGatewayEntity();
+                                    updateInfo.setIs_Status(5);
+                                    updateInfo.setRemark("Error: " + e.getMessage());
+                                    smsGatewayService.updateConditionalMessageById(smsMatchConditionLogGw.getGID()+1, updateInfo);
+                                    System.out.println("Error round "+sendSmsCount+" publishing: " + e.getMessage());
+                                    return;
                                 }
                             }
-                            Timestamp sendDate = DateTime.getTimeStampNow(); 
-                            SmsGatewayEntity updateInfo = new SmsGatewayEntity();
-                            updateInfo.setIs_Status(1);
-                            updateInfo.setSend_Date(sendDate);
-                            // System.out.println("smsMatchConditionGw.getGID: " + smsMatchConditionGw.getGID() );
-                            smsGatewayService.updateConditionalMessageById(smsMatchConditionGw.getGID(), updateInfo);
+                            
                         }else{
                             Timestamp createdDate = DateTime.getTimeStampNow(); 
                             SmsGatewayEntity smsMisMatchConditionGw = new SmsGatewayEntity();
@@ -241,6 +254,7 @@ public class KafkaConsumerService {
                             smsMisMatchConditionGw.setOrderType(receivedData.getOrderType().toUpperCase());
                             smsMisMatchConditionGw.setOrder_type_mainID(orderTypeData.getMainID());
                             smsMisMatchConditionGw.setIs_Status(2);
+                            smsMisMatchConditionGw.setRemark("consition miss match");
                             smsMisMatchConditionGw.setPayloadMQ(messageMqClob);
                             smsMisMatchConditionGw.setReceive_Date(receiveDate);
                             smsMisMatchConditionGw.setTransaction_id(getTransactionID(createdDate));
@@ -256,6 +270,7 @@ public class KafkaConsumerService {
                     smsMisMatchConditionGw.setOrderType(receivedData.getOrderType().toUpperCase());
                     smsMisMatchConditionGw.setOrder_type_mainID(orderTypeData.getMainID());
                     smsMisMatchConditionGw.setIs_Status(2);
+                    smsMisMatchConditionGw.setRemark("not found conditions");
                     smsMisMatchConditionGw.setTransaction_id(getTransactionID(createdDate));
                     smsMisMatchConditionGw.setPayloadMQ(messageMqClob);
                     smsMisMatchConditionGw.setReceive_Date(receiveDate);
