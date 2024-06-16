@@ -1,5 +1,6 @@
 package com.nt.sms_module_worker.util;
 
+import java.math.BigDecimal;
 import java.sql.Timestamp;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -53,6 +54,61 @@ public class Condition {
                 return dataValue.equals(orConfValue);
             case "like":
                 return dataValue.contains(orConfValue);
+            default:
+                return false;
+        }
+    }
+
+    public static final boolean doFloatOperation(String operator,Float dataNumber, Float orConfNumber){
+        switch (operator) {
+            case "!=":
+                return !dataNumber.equals(orConfNumber);
+            case "=":
+                return dataNumber.equals(orConfNumber);
+            case "<":
+                return dataNumber < orConfNumber;
+            case ">":
+                return dataNumber > orConfNumber;    
+            case "<=":
+                return dataNumber <= orConfNumber; 
+            case ">=":
+                return dataNumber >= orConfNumber; 
+            default:
+                return false;
+        }
+    }
+
+    public static final boolean doDoubleOperation(String operator,Double dataNumber, Double orConfNumber){
+        switch (operator) {
+            case "!=":
+                return !dataNumber.equals(orConfNumber);
+            case "=":
+                return dataNumber.equals(orConfNumber);
+            case "<":
+                return dataNumber < orConfNumber;
+            case ">":
+                return dataNumber > orConfNumber;    
+            case "<=":
+                return dataNumber <= orConfNumber; 
+            case ">=":
+                return dataNumber >= orConfNumber; 
+            default:
+                return false;
+        }
+    }
+
+    public static final boolean doBigDecimalOperation(String operator,BigDecimal number1, BigDecimal number2){
+        switch (operator) {
+            case ">":
+                return number1.compareTo(number2) < 0;
+            case "<":
+                return number1.compareTo(number2) > 0;
+            case "<=":
+                return number1.compareTo(number2) <= 0;
+            case ">=":
+                return number1.compareTo(number2) >= 0;
+            case "=":
+                return number1.compareTo(number2) == 0;
             default:
                 return false;
         }
@@ -120,7 +176,10 @@ public class Condition {
             return "Integer";
         } else if (obj instanceof String) {
             return "String";
+        } else if (obj instanceof Double) {
+            return "Double";
         }
+        
         return "Unknown";
     }
 
@@ -263,6 +322,18 @@ public class Condition {
                 String dataStr = jsonData.getString(conditionKey);
                 String conditionStr = orValueConfig.getString("value");
                 return Condition.doStringOperation(operation_type, dataStr, conditionStr);
+            case "BigDecimal":
+                BigDecimal dataBigDecimal = jsonData.getBigDecimal(conditionKey);
+                BigDecimal conditionBigDecimal = orValueConfig.getBigDecimal("value");
+                return Condition.doBigDecimalOperation(operation_type, dataBigDecimal, conditionBigDecimal);
+            case "Float":
+                Float dataFloat = jsonData.getFloat(conditionKey);
+                Float conditionFloat = orValueConfig.getFloat("value");
+                return Condition.doFloatOperation(operation_type, dataFloat, conditionFloat);
+            case "Double":
+                Double dataDouble = jsonData.getDouble(conditionKey);
+                Double conditionDouble = orValueConfig.getDouble("value");
+                return Condition.doDoubleOperation(operation_type, dataDouble, conditionDouble);
             case "JSONArray":
                 JSONArray conditionArray = orValueConfig.getJSONArray("value");
                 return Condition.doArrayOperation(operation_type, conditionKey, jsonData, conditionArray);

@@ -75,6 +75,9 @@ public class SmsGatewayEntity {
         @Column(name = "REFID", unique = false,nullable = true)
         private String RefID = null;
 
+        @Column(name = "CONSENTPDPA", unique = false,nullable = true)
+        private String consentPDPA = null;
+
         @Column(name = "TRANSACTION_ID", unique = false,nullable = true)
         private String transaction_id = null;
 }

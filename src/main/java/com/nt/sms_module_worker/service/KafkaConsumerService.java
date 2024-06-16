@@ -211,6 +211,8 @@ public class KafkaConsumerService {
                             sendSmsData.setMessages(smsMessages);
                             objectMapper = new ObjectMapper();
                             String payloadGwStr = objectMapper.writeValueAsString(sendSmsData);
+                            String consentPDPALog = objectMapper.writeValueAsString(consentPDPA);
+                            smsMatchConditionGw.setConsentPDPA(consentPDPALog);
                             Clob payloadGwClob = new javax.sql.rowset.serial.SerialClob(payloadGwStr.toCharArray());
                             smsMatchConditionGw.setPayloadGW(payloadGwClob);
                             
