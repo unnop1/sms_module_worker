@@ -41,7 +41,7 @@ public class DateTime {
         return year+month+day;
     }
 
-    public static final Timestamp getRequestDateUtcNow(){
+    public static final LocalDateTime getRequestDateUtcNow(){
         // Get the current instant
         Instant now = Instant.now();
 
@@ -57,10 +57,7 @@ public class DateTime {
         // Parse the string to a LocalDateTime
         LocalDateTime localDateTime = LocalDateTime.parse(formattedDateTime, formatter);
 
-        // Convert LocalDateTime to java.sql.Timestamp
-        Timestamp sqlTimestamp = Timestamp.valueOf(localDateTime);
-
-        return sqlTimestamp;
+        return localDateTime;
     }
 
     public static final Timestamp convertTimeStampDataModel(String input){

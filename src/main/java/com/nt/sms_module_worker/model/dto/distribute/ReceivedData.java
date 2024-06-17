@@ -12,6 +12,8 @@ public class ReceivedData {
     private String triggerDate;
     @JsonProperty("orderType")
     private String orderType;
+    @JsonProperty("orderID")
+    private String orderID;
     @JsonProperty("msisdn")
     private String msisdn;
     @JsonProperty("publishChannel")

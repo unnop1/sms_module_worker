@@ -116,7 +116,7 @@ public class KafkaConsumerService {
             smsMisMatchConditionGw.setIs_Status(2);
             smsMisMatchConditionGw.setPayloadMQ(messageMqClob);
             smsMisMatchConditionGw.setReceive_Date(receiveDate);
-            smsMisMatchConditionGw.setTransaction_id(getTransactionID(createdDate));
+            smsMisMatchConditionGw.setTransaction_id(receivedData.getOrderID());
             smsMisMatchConditionGw.setRemark("ไม่พบ OrderType "+receivedData.getOrderType());
             smsMisMatchConditionGw.setCreated_Date(createdDate);
             smsGatewayService.createConditionalMessage(smsMisMatchConditionGw);
@@ -170,7 +170,8 @@ public class KafkaConsumerService {
                                     smsNotEnableConditionGw.setPhoneNumber(receivedData.getMsisdn());
                                     smsNotEnableConditionGw.setOrderType(receivedData.getOrderType().toUpperCase());
                                     smsNotEnableConditionGw.setIs_Status(4);
-                                    smsNotEnableConditionGw.setTransaction_id(getTransactionID(createdDate));
+                                    smsNotEnableConditionGw.setRefID(condition.getRefID());
+                                    smsNotEnableConditionGw.setTransaction_id(receivedData.getOrderID());
                                     smsNotEnableConditionGw.setPayloadMQ(messageMqClob);
                                     smsNotEnableConditionGw.setReceive_Date(receiveDate);
                                     smsNotEnableConditionGw.setCreated_Date(createdDate);
@@ -184,12 +185,13 @@ public class KafkaConsumerService {
                             smsMatchConditionGw.setConfig_conditions_ID(condition.getConditionsID());
                             smsMatchConditionGw.setPhoneNumber(receivedData.getMsisdn());
                             smsMatchConditionGw.setIs_Status(0);
+                            smsMatchConditionGw.setRefID(condition.getRefID());
                             smsMatchConditionGw.setOrderType(receivedData.getOrderType().toUpperCase());
                             smsMatchConditionGw.setOrder_type_mainID(orderTypeData.getMainID());
                             smsMatchConditionGw.setPayloadMQ(messageMqClob);
                             smsMatchConditionGw.setRemark("sending sms");
                             smsMatchConditionGw.setReceive_Date(receiveDate);
-                            smsMatchConditionGw.setTransaction_id(systemTransRef);
+                            smsMatchConditionGw.setTransaction_id(receivedData.getOrderID());
                             smsMatchConditionGw.setCreated_Date(createdDate);
                             
                             // System.out.println("smsMessage: " + smsMessage + " to phone " + receivedData.getMsisdn() );
@@ -222,30 +224,31 @@ public class KafkaConsumerService {
                             // smsMatchConditiontestlogGw.setRemark("GID:"+smsMatchConditionLogGw);
                             // smsGatewayService.createConditionalMessage(smsMatchConditiontestlogGw);
 
-
-                            for (int sendSmsCount = 1; sendSmsCount <= MaxRetrySendSmsCount ; sendSmsCount++) {
-                                try{
-                                    smsConditionService.publish("RtcSmsBatchEx","" , sendSmsData);
-                                    Timestamp sendDate = DateTime.getTimeStampNow(); 
-                                    SmsGatewayEntity updateInfo = new SmsGatewayEntity();
-                                    updateInfo.setIs_Status(1);
-                                    updateInfo.setRemark("Send sms to gateway successfully");
-                                    updateInfo.setSend_Date(sendDate);
-                                    // System.out.println("smsMatchConditionGw.getGID: " + smsMatchConditionGw.getGID() );
-                                    smsGatewayService.updateConditionalMessageById(smsMatchConditionLogGw.getGID()+1, updateInfo);
-                                }catch (Exception e){
-                                    if (sendSmsCount >= MaxRetrySendSmsCount){
+                            if(!isSkipSendSms){
+                                for (int sendSmsCount = 1; sendSmsCount <= MaxRetrySendSmsCount ; sendSmsCount++) {
+                                    try{
+                                        smsConditionService.publish("RtcSmsBatchEx","" , sendSmsData);
+                                        Timestamp sendDate = DateTime.getTimeStampNow(); 
                                         SmsGatewayEntity updateInfo = new SmsGatewayEntity();
-                                        updateInfo.setIs_Status(3);
+                                        updateInfo.setIs_Status(1);
+                                        updateInfo.setRemark("Send sms to gateway successfully");
+                                        updateInfo.setSend_Date(sendDate);
+                                        // System.out.println("smsMatchConditionGw.getGID: " + smsMatchConditionGw.getGID() );
                                         smsGatewayService.updateConditionalMessageById(smsMatchConditionLogGw.getGID()+1, updateInfo);
+                                    }catch (Exception e){
+                                        if (sendSmsCount >= MaxRetrySendSmsCount){
+                                            SmsGatewayEntity updateInfo = new SmsGatewayEntity();
+                                            updateInfo.setIs_Status(3);
+                                            smsGatewayService.updateConditionalMessageById(smsMatchConditionLogGw.getGID()+1, updateInfo);
+                                            return;
+                                        }
+                                        SmsGatewayEntity updateInfo = new SmsGatewayEntity();
+                                        updateInfo.setIs_Status(5);
+                                        updateInfo.setRemark("Error: " + e.getMessage());
+                                        smsGatewayService.updateConditionalMessageById(smsMatchConditionLogGw.getGID()+1, updateInfo);
+                                        System.out.println("Error round "+sendSmsCount+" publishing: " + e.getMessage());
                                         return;
                                     }
-                                    SmsGatewayEntity updateInfo = new SmsGatewayEntity();
-                                    updateInfo.setIs_Status(5);
-                                    updateInfo.setRemark("Error: " + e.getMessage());
-                                    smsGatewayService.updateConditionalMessageById(smsMatchConditionLogGw.getGID()+1, updateInfo);
-                                    System.out.println("Error round "+sendSmsCount+" publishing: " + e.getMessage());
-                                    return;
                                 }
                             }
                             
@@ -259,7 +262,7 @@ public class KafkaConsumerService {
                             smsMisMatchConditionGw.setRemark("consition miss match");
                             smsMisMatchConditionGw.setPayloadMQ(messageMqClob);
                             smsMisMatchConditionGw.setReceive_Date(receiveDate);
-                            smsMisMatchConditionGw.setTransaction_id(getTransactionID(createdDate));
+                            smsMisMatchConditionGw.setTransaction_id(receivedData.getOrderID());
                             smsMisMatchConditionGw.setCreated_Date(createdDate);
                             smsGatewayService.createConditionalMessage(smsMisMatchConditionGw);
                         }
@@ -273,7 +276,7 @@ public class KafkaConsumerService {
                     smsMisMatchConditionGw.setOrder_type_mainID(orderTypeData.getMainID());
                     smsMisMatchConditionGw.setIs_Status(2);
                     smsMisMatchConditionGw.setRemark("not found conditions");
-                    smsMisMatchConditionGw.setTransaction_id(getTransactionID(createdDate));
+                    smsMisMatchConditionGw.setTransaction_id(receivedData.getOrderID());
                     smsMisMatchConditionGw.setPayloadMQ(messageMqClob);
                     smsMisMatchConditionGw.setReceive_Date(receiveDate);
                     smsMisMatchConditionGw.setCreated_Date(createdDate);
@@ -285,7 +288,7 @@ public class KafkaConsumerService {
                 smsNotEnableConditionGw.setPhoneNumber(receivedData.getMsisdn());
                 smsNotEnableConditionGw.setOrderType(receivedData.getOrderType().toUpperCase());
                 smsNotEnableConditionGw.setIs_Status(2);
-                smsNotEnableConditionGw.setTransaction_id(getTransactionID(createdDate));
+                smsNotEnableConditionGw.setTransaction_id(receivedData.getOrderID());
                 smsNotEnableConditionGw.setPayloadMQ(messageMqClob);
                 smsNotEnableConditionGw.setReceive_Date(receiveDate);
                 smsNotEnableConditionGw.setCreated_Date(createdDate);

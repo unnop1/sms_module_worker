@@ -1,6 +1,8 @@
 package com.nt.sms_module_worker.model.dto.distribute;
 
 import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -29,7 +31,7 @@ public class DataSmsMessage {
 
     // Client's request date time (YYYY-MM-DD HH24:MI:SS)
     @JsonProperty("requestDate")
-    private Timestamp requestDate;
+    private LocalDateTime requestDate;
     
     // message text
     @JsonProperty("message")
