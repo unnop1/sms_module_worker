@@ -1,7 +1,5 @@
 package com.nt.sms_module_worker.model.dto.distribute;
 
-import java.sql.Timestamp;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import com.fasterxml.jackson.annotation.JsonProperty;

@@ -71,9 +71,6 @@ public class SmsConditionService {
     System.out.println("smsCondition.getConditions_or:"+smsCondition.getConditions_and());
         try{
             if(smsCondition.getConditions_and() != null){
-                /*  
-                    User want to swap condition AND to OR
-                */
                 // System.out.println("smsCondition.getConditions_and:"+smsCondition.getConditions_and());
                 JSONArray jsonSmsAndCon = new JSONArray(smsCondition.getConditions_and());
                 
@@ -88,9 +85,6 @@ public class SmsConditionService {
             }
 
             if(smsCondition.getConditions_or()!= null){
-                /*  
-                    User want to swap condition OR to AND
-                */
                 // System.out.println("smsCondition.getConditions_or:"+smsCondition.getConditions_or());
                 JSONArray jsonSmsOrCon = new JSONArray(smsCondition.getConditions_or());
                 

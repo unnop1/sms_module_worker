@@ -23,6 +23,15 @@ public class MapString {
             case "String":
                 output = object.getString(key);
                 break;
+            case "Double":
+                output = Double.toString(object.getDouble(key));
+                break;
+            case "Float":
+                output = Float.toString(object.getFloat(key));
+                break;
+            case "Long":
+                output = Long.toString(object.getLong(key));
+                break;
         }
         return output;
     }
@@ -47,20 +56,20 @@ public class MapString {
                             currentObject = (JSONObject) obj;
                         } else {
                             // If the value is not a JSONObject, it should be the desired value
-                            System.out.println("Output: " + obj);
+                            // System.out.println("Output: " + obj);
                             output = interString(currentObject, part);
                             break;
                         }
                     } else {
                         // If the array is empty, print an error message
-                        System.out.println("Error: Array is empty");
+                        // System.out.println("Error: Array is empty");
                         break;
                     }
                 } else if (obj instanceof JSONObject) {
                     currentObject = (JSONObject) obj;
                 } else {
                     // If the value is not a JSONObject or JSONArray, it should be the desired value
-                    System.out.println("Output: " + obj);
+                    // System.out.println("Output: " + obj);
                     output = interString(currentObject, part);
                     break;
                 }

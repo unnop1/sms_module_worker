@@ -107,7 +107,7 @@ public class KafkaConsumerService {
         Clob messageMqClob = new javax.sql.rowset.serial.SerialClob(messageMq.toCharArray());
 
         OrderTypeEntity orderTypeData = orderTypeService.getOrderType(receivedData.getOrderType().toUpperCase());
-        System.out.println("orderTypeData: " + orderTypeData.getOrderTypeName() );
+        // System.out.println("orderTypeData: " + orderTypeData.getOrderTypeName() );
         if (orderTypeData.getOrderTypeName() == null){
             Timestamp createdDate = DateTime.getTimeStampNow();        
             SmsGatewayEntity smsMisMatchConditionGw = new SmsGatewayEntity();
@@ -122,12 +122,12 @@ public class KafkaConsumerService {
             smsGatewayService.createConditionalMessage(smsMisMatchConditionGw);
         }else{
             Integer isEnableOrderType = orderTypeData.getIsEnable();
-            System.out.println("isEnableOrderType: " + isEnableOrderType );
+            // System.out.println("isEnableOrderType: " + isEnableOrderType );
             if (isEnableOrderType.equals(1)){
                 // System.out.println("smsEnableConditionGw remark" );
                 // String querySmsCondition = smsConditionService.getQueryOrderTypeSmsCondition(receivedData);
                 List<ConfigConditionsEntity> smsConditions = smsConditionService.getListSmsCondition(receivedData.getOrderType());
-                System.out.println("smsConditions size: " + smsConditions.size() );
+                // System.out.println("smsConditions size: " + smsConditions.size() );
                 
                 if (smsConditions.size() > 0) {    
                     // send sms
@@ -220,9 +220,6 @@ public class KafkaConsumerService {
                             
                             SmsGatewayEntity smsMatchConditionLogGw = smsGatewayService.createConditionalMessage(smsMatchConditionGw);
                             
-                            // SmsGatewayEntity smsMatchConditiontestlogGw = new SmsGatewayEntity();
-                            // smsMatchConditiontestlogGw.setRemark("GID:"+smsMatchConditionLogGw);
-                            // smsGatewayService.createConditionalMessage(smsMatchConditiontestlogGw);
 
                             if(!isSkipSendSms){
                                 for (int sendSmsCount = 1; sendSmsCount <= MaxRetrySendSmsCount ; sendSmsCount++) {

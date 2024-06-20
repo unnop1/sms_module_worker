@@ -16,6 +16,12 @@ public class Condition {
             return "Integer";
         } else if (checkTypeField instanceof String) {
             return "String";
+        } else if (checkTypeField instanceof Long) {
+            return "Long";
+        } else if (checkTypeField instanceof Double) {
+            return "Double";
+        } else if (checkTypeField instanceof Float) {
+            return "Float";
         } else if (checkTypeField instanceof Boolean) {
             return "Boolean";
         } else if (checkTypeField instanceof JSONObject) {
@@ -202,7 +208,7 @@ public class Condition {
                         for (int i = 0; i < conditionArray.length(); i++) {
                             Object conditionObject = conditionArray.get(i);
                             String elementType = checkTypeObject(conditionObject, conditionKey);
-                            System.out.println("conditionKey: "+conditionKey+" ,  elementType : " + elementType);
+                            // System.out.println("conditionKey: "+conditionKey+" ,  elementType : " + elementType);
                             switch ( elementType ) {
                                 case "String":
                                     String conditionStr = conditionArray.getString(i);
@@ -212,7 +218,7 @@ public class Condition {
                                     break;
                                 case "ValueConfig":
                                     JSONObject subCondition = conditionArray.getJSONObject(i);
-                                    System.out.println("==> subCondition : " + subCondition);
+                                    // System.out.println("==> subCondition : " + subCondition);
                                     boolean isMatchCondition = checkAndCondition(subCondition, jsonData);
                                     if (isMatchCondition){
                                         found = true;
@@ -229,12 +235,12 @@ public class Condition {
                         break;
                     case "between":
                         // Date Between
-                        System.out.println("dataStr:"+dataStr);
+                        // System.out.println("dataStr:"+dataStr);
                         Timestamp dataTimestamp = DateTime.convertTimeStampDataModel(dataStr);
                         String startTimeStr = conditionArray.getString(0);
                         String endTimeStr = conditionArray.getString(1);
-                        System.out.println("startTimeStr:"+startTimeStr);
-                        System.out.println("endTimeStr:"+endTimeStr);
+                        // System.out.println("startTimeStr:"+startTimeStr);
+                        // System.out.println("endTimeStr:"+endTimeStr);
                         Timestamp startTime = Timestamp.valueOf(startTimeStr);
                         Timestamp endTime = Timestamp.valueOf(endTimeStr);
 
