@@ -2,6 +2,8 @@ package com.nt.sms_module_worker.util;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -52,7 +54,29 @@ public class Condition {
         }
     }
 
+
+    public static final boolean isDateFormatData(String dateCheck){
+        if(DateTime.validateDate(dateCheck, "yyyy-MM-dd")){
+            return true;
+        }else if(DateTime.validateDate(dateCheck, "yyyy-MM-dd HH:mm:ss")){
+            return true;
+        }
+        return false;
+    }
+
     public static final boolean doStringOperation(String operator,String dataValue, String orConfValue){
+        // Date String operations
+        if(isDateFormatData(orConfValue)){
+            try{
+                LocalDateTime dataDateTime = DateTime.convertDateTime(dataValue);
+                LocalDateTime conditionDateTime = DateTime.convertDateTime(orConfValue);
+                return doDateTimeOperation(operator, dataDateTime, conditionDateTime);
+            }catch(Exception e){
+                System.out.println("error converting date time : " + e.getMessage());
+            }
+        }
+
+        // Default String operations
         switch (operator) {
             case "!=":
                 return !dataValue.equals(orConfValue);
@@ -120,6 +144,23 @@ public class Condition {
         }
     }
 
+    public static final boolean doDateTimeOperation(String operator,LocalDateTime datetime1, LocalDateTime datetime2){
+        switch (operator) {
+            case ">":
+                return datetime1.compareTo(datetime2) < 0;
+            case "<":
+                return datetime1.compareTo(datetime2) > 0;
+            case "<=":
+                return datetime1.compareTo(datetime2) <= 0;
+            case ">=":
+                return datetime1.compareTo(datetime2) >= 0;
+            case "=":
+                return datetime1.compareTo(datetime2) == 0;
+            default:
+                return false;
+        }
+    }
+
 
 
     public static final boolean doTimeStampOperation(String operator,Timestamp timestamp1, Timestamp timestamp2){
@@ -140,8 +181,6 @@ public class Condition {
     }
 
     public static final boolean doNumberOperation(String operator,Integer dataNumber, Integer orConfNumber){
-        // int dataNumber = Integer.parseInt(dataValue);
-        // int orConfNumber = Integer.parseInt(orConfValue);
         System.out.println(operator+" , dataNumber: "+dataNumber+ " , orConfNumber:"+ orConfNumber);
         switch (operator) {
             case "!=":
@@ -236,16 +275,16 @@ public class Condition {
                     case "between":
                         // Date Between
                         // System.out.println("dataStr:"+dataStr);
-                        Timestamp dataTimestamp = DateTime.convertTimeStampDataModel(dataStr);
+                        LocalDateTime dataTimestamp = DateTime.convertDateTime(dataStr);
                         String startTimeStr = conditionArray.getString(0);
                         String endTimeStr = conditionArray.getString(1);
                         // System.out.println("startTimeStr:"+startTimeStr);
                         // System.out.println("endTimeStr:"+endTimeStr);
-                        Timestamp startTime = Timestamp.valueOf(startTimeStr);
-                        Timestamp endTime = Timestamp.valueOf(endTimeStr);
+                        LocalDateTime startTime = DateTime.convertDateTime(startTimeStr);
+                        LocalDateTime endTime = DateTime.convertDateTime(endTimeStr);
 
-                        if (doTimeStampOperation(">=", dataTimestamp, startTime)&&
-                            doTimeStampOperation("<=", dataTimestamp, endTime)) {
+                        if (doDateTimeOperation(">=", dataTimestamp, startTime)&&
+                            doDateTimeOperation("<=", dataTimestamp, endTime)) {
                             found = true;
                         }
                         break;

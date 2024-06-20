@@ -68,7 +68,7 @@ public class PDPAClient {
         ConsentResp respData = null;
         try {
             URL url = new URL(String.format(
-                    "http://%s/portal/sdk/b418204c-ab26-11ee-ae53-9eee6c3a4940/datasubject?identify=%s",
+                    "http://%s/portal/sdk/ffacb956-df55-11ee-a97b-0242ac14001e/datasubject?identify=%s",
                     host,
                     phoneNumber
                 )

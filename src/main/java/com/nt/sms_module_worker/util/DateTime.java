@@ -60,7 +60,7 @@ public class DateTime {
         return localDateTime;
     }
 
-    public static final Timestamp convertTimeStampDataModel(String input){
+    public static final LocalDateTime convertDateTime(String input){
 
         String simpleFormat = "yyyy-MM-dd";
         String timeStampFormat = "yyyy-MM-dd HH:mm:ss";
@@ -70,9 +70,8 @@ public class DateTime {
         }
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(timeStampFormat);
         LocalDateTime dateTime = LocalDateTime.parse(input, formatter);
-        Instant instant = dateTime.atZone(ZoneId.systemDefault()).toInstant();
-        Timestamp dataTime = Timestamp.from(instant);
-        return dataTime;
+        
+        return dateTime;
     }
 
     public static boolean validateDate(String inputDate, String format) {
