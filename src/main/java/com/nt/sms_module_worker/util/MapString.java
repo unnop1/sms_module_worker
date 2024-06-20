@@ -15,10 +15,10 @@ public class MapString {
         String output = "";
         switch (objectType) {
             case "Integer":
-                output = ""+object.getInt(key);
+                output = Integer.toString(object.getInt(key));
                 break;
             case "Boolean":
-                output = ""+object.getBoolean(key);
+                output = Boolean.toString(object.getBoolean(key));
                 break;
             case "String":
                 output = object.getString(key);
