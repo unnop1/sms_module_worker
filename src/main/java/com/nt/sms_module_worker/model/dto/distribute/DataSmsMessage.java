@@ -2,6 +2,7 @@ package com.nt.sms_module_worker.model.dto.distribute;
 
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -32,6 +33,7 @@ public class DataSmsMessage {
     private String systemTransRef;
 
     // Client's request date time (YYYY-MM-DD HH24:MI:SS)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
     @JsonProperty("requestDate")
     private LocalDateTime requestDate;
     
