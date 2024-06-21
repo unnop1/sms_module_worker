@@ -26,6 +26,8 @@ public class Condition {
             return "Float";
         } else if (checkTypeField instanceof Boolean) {
             return "Boolean";
+        } else if (checkTypeField instanceof LocalDateTime) {
+            return "LocalDateTime";
         } else if (checkTypeField instanceof JSONObject) {
             JSONObject jsonObj = jObj.getJSONObject(fieldName);
             Integer jsonSize = jObj.getJSONObject(fieldName).length();
@@ -363,7 +365,7 @@ public class Condition {
                 Boolean dataBool = jsonData.getBoolean(conditionKey);
                 Boolean conditionBool = orValueConfig.getBoolean("value");
                 return Condition.doBooleanOperation(operation_type, dataBool, conditionBool);
-            case "String":
+            case "String", "LocalDateTime":
                 String dataStr = jsonData.getString(conditionKey);
                 String conditionStr = orValueConfig.getString("value");
                 return Condition.doStringOperation(operation_type, dataStr, conditionStr);

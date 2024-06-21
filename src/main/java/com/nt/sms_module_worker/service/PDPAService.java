@@ -14,6 +14,9 @@ import lombok.Getter;
 @Getter
 public class PDPAService {
 
+    @Value("${pdpa.purpose_id}")
+    private String purposeID;
+
     @Value("${pdpa.is-skip-pdpa}")
     private boolean isSkipCheckPDPA;
 
@@ -44,7 +47,7 @@ public class PDPAService {
     }
 
     public ConsentResp getPDPAConsent(String phoneNumber){
-        ConsentResp resp = client.GetConsentPDPAByPhoneNumber(phoneNumber);
+        ConsentResp resp = client.GetConsentPDPAByPhoneNumber(purposeID, phoneNumber);
         return resp;
     }
     
