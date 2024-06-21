@@ -212,6 +212,7 @@ public class KafkaConsumerService {
                             sendSmsData.setBulkRef("BulkTest-e9bfae24-82c5-11ee-b962-0242ac120002");
                             sendSmsData.setMessages(smsMessages);
                             objectMapper = new ObjectMapper();
+                            objectMapper.findAndRegisterModules();
                             String payloadGwStr = objectMapper.writeValueAsString(sendSmsData);
                             String consentPDPALog = objectMapper.writeValueAsString(consentPDPA);
                             smsMatchConditionGw.setConsentPDPA(consentPDPALog);
