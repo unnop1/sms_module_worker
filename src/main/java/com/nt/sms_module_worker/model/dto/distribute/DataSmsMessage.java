@@ -32,8 +32,6 @@ public class DataSmsMessage {
     private String systemTransRef;
 
     // Client's request date time (YYYY-MM-DD HH24:MI:SS)
-    @JsonSerialize(using = LocalDateTimeSerializer.class)
-    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     @JsonProperty("requestDate")
     private LocalDateTime requestDate;
     
