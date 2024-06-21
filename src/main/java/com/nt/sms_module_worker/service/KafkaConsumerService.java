@@ -6,6 +6,7 @@ import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.stereotype.Component;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.nt.sms_module_worker.model.dto.distribute.DataSmsMessage;
 import com.nt.sms_module_worker.model.dto.distribute.ReceivedData;
 import com.nt.sms_module_worker.model.dto.distribute.SendSmsGatewayData;
@@ -211,8 +212,7 @@ public class KafkaConsumerService {
                             }
                             sendSmsData.setBulkRef("BulkTest-e9bfae24-82c5-11ee-b962-0242ac120002");
                             sendSmsData.setMessages(smsMessages);
-                            objectMapper = new ObjectMapper();
-                            objectMapper.findAndRegisterModules();
+                            objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());;
                             String payloadGwStr = objectMapper.writeValueAsString(sendSmsData);
                             String consentPDPALog = objectMapper.writeValueAsString(consentPDPA);
                             smsMatchConditionGw.setConsentPDPA(consentPDPALog);
