@@ -109,7 +109,7 @@ public class KafkaConsumerService {
 
         OrderTypeEntity orderTypeData = orderTypeService.getOrderType(receivedData.getOrderType().toUpperCase());
         // System.out.println("orderTypeData: " + orderTypeData.getOrderTypeName() );
-        if (orderTypeData.getOrderTypeName() == null){
+        if (orderTypeData == null){
             Timestamp createdDate = DateTime.getTimeStampNow();        
             SmsGatewayEntity smsMisMatchConditionGw = new SmsGatewayEntity();
             smsMisMatchConditionGw.setPhoneNumber(receivedData.getMsisdn());
@@ -248,6 +248,13 @@ public class KafkaConsumerService {
                                         return;
                                     }
                                 }
+                            }else{
+                                Timestamp sendDate = DateTime.getTimeStampNow(); 
+                                SmsGatewayEntity updateInfo = new SmsGatewayEntity();
+                                updateInfo.setIs_Status(1);
+                                updateInfo.setRemark("Skip Send sms to gateway");
+                                updateInfo.setSend_Date(sendDate);
+                                smsGatewayService.updateConditionalMessageById(smsMatchConditionLogGw.getGID()+1, updateInfo);
                             }
                             
                         }else{
