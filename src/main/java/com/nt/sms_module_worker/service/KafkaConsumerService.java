@@ -56,7 +56,7 @@ public class KafkaConsumerService {
         autoStartup="true",
         // {"orderType": "new", "payload":"123"}
         // topics = {"New", "Suspend", "Reconnect", "Change_Package", "Add_Package", "Delete_Package", "Topup_Recharge", "Package_Expire"}, 
-        topics = {"NEW", "SUSPEND", "RECONNECT", "CHANGEPACKAGE", "ADD_PACKAGE", "DELETE_PACKAGE", "TOPUP_RECHARGE", "PACKAGE_EXPIRE"}, 
+        topics = {"NEW", "SUSPEND", "RECONNECT", "CHANGEPACKAGE", "ADDPACKAGE", "DELETEPACKAGE", "TOPUPRECHARGE", "PACKAGEEXPIRE"}, 
         groupId = "sms_module.worker"
     )
     public void listening(@Payload String message, @Header(KafkaHeaders.RECEIVED_TOPIC) String topic) throws Exception {
@@ -212,7 +212,7 @@ public class KafkaConsumerService {
                             }
                             sendSmsData.setBulkRef("BulkTest-e9bfae24-82c5-11ee-b962-0242ac120002");
                             sendSmsData.setMessages(smsMessages);
-                            objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());;
+                            objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
                             String payloadGwStr = objectMapper.writeValueAsString(sendSmsData);
                             String consentPDPALog = objectMapper.writeValueAsString(consentPDPA);
                             smsMatchConditionGw.setConsentPDPA(consentPDPALog);
