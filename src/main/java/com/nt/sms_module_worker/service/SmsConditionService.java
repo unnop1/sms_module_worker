@@ -19,6 +19,7 @@ import org.springframework.stereotype.Component;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.nt.sms_module_worker.entity.ConfigConditionsEntity;
 import com.nt.sms_module_worker.model.dto.distribute.SendSmsGatewayData;
 import com.nt.sms_module_worker.repo.SmsConditionRepo;
@@ -41,7 +42,7 @@ public class SmsConditionService {
     // System.out.println("Sending message...");
     // rabbitTemplate.convertAndSend("", routingKey, bulkMessage);
     // Serialize the message object to JSON
-    ObjectMapper objectMapper = new ObjectMapper();
+    ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
     String message = objectMapper.writeValueAsString(bulkMessage);
 
     // Set the headers

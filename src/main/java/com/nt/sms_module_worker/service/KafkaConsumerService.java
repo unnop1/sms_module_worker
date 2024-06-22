@@ -55,10 +55,10 @@ public class KafkaConsumerService {
     @KafkaListener(
         autoStartup="true",
         // PRODUCTION
-        topics = {"NEW","SUSPEND","PACKAGEEXPIRE","RECONNECT","CHANGEPACKAGE","ADDPACKAGE","DELETEPACKAGE","TOPUPRECHARGE"}, 
+        // topics = {"NEW","SUSPEND","PACKAGEEXPIRE","RECONNECT","CHANGEPACKAGE","ADDPACKAGE","DELETEPACKAGE","TOPUPRECHARGE"}, 
 
         // DEV
-        // topics = {"PACKAGEEXPIRE","CHANGEOWNER","BULKPREPROVISIONING","VARIETYSERVICE","SERVICECREDITLIMIT","SWAPPREPAIDTOPOSTPAID","CONTRACTMANAGEMENT","EXTENDEXPIRATIONDATE","CREDITLIMIT","NEW","SUSPEND","RECONNECT","TERMINATE","CHANGEPACKAGE","DELETEPACKAGE","TOPUPRECHARGE","ADDPACKAGE","CHANGEMSISDN"}, 
+        topics = {"ADDPACKAGE","BULKPREPROVISIONING","CHANGEMSISDN","CHANGEOWNER","CHANGEPACKAGE","CONTRACTMANAGEMENT","CREDITLIMIT","DELETEPACKAGE","EXTENDEXPIRATIONDATE","NEW","NOTIFICATIONPACKAGESTATUSCHANGE","PACKAGEEXPIRE","RECONNECT","SUSPEND","SWAPPOSTPAIDTOPREPAID","SWAPPREPAIDTOPOSTPAID","TERMINATE","TOPUPRECHARGE","VARIETYSERVICE"},
         groupId = "sms_module.worker"
     )
     public void listening(@Payload String message, @Header(KafkaHeaders.RECEIVED_TOPIC) String topic) throws Exception {
@@ -206,7 +206,8 @@ public class KafkaConsumerService {
                             for (int i = 0; i < phoneNumberSendSms.size();i++){
                                 DataSmsMessage smsData = new DataSmsMessage();
                                 smsData.setMessage(smsMessage);
-                                smsData.setSystemTransRef(systemTransRef);
+                                // smsData.setSystemTransRef(systemTransRef);
+                                smsData.setSystemTransRef("f52888f8-82c5-11ee-b962-0242ac120512");
                                 smsData.setTarget(phoneNumberSendSms.get(i));
                                 smsData.setSource("my");
                                 smsData.setRequestDate(DateTime.getRequestDateUtcNow());
