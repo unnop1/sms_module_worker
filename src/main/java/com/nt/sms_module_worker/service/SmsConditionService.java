@@ -40,8 +40,8 @@ public class SmsConditionService {
 
   public void publish(String exchangeName, String routingKey,SendSmsGatewayData bulkMessage) throws Exception {
     ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
-    // String message = objectMapper.writeValueAsString(bulkMessage);
-    String message = "{\"messages\":[{\"systemCode\":\"REDS\",\"target\":\"66893054171\",\"source\":\"my\",\"message\":\"ทดสอบการส่งข้อความ\",\"systemTransRef\":\"f52888f8-82c5-11ee-b962-0242ac120002\",\"requestDate\":\"2023-11-14 05:10:20\"}],\"bulkRef\":\"BulkTest-e9bfae24-82c5-11ee-b962-0242ac120002\"}";
+    String message = objectMapper.writeValueAsString(bulkMessage);
+    // String message = "{\"messages\":[{\"systemCode\":\"REDS\",\"target\":\"66893054171\",\"source\":\"my\",\"message\":\"ทดสอบการส่งข้อความ\",\"systemTransRef\":\"f52888f8-82c5-11ee-b962-0242ac120099\",\"requestDate\":\"2023-06-22 17:31:20\"}],\"bulkRef\":\"BulkTest-e9bfae24-82c5-11ee-b962-0242ac120002\"}";
 
     // Set the headers
     Map<String, Object> headers = new HashMap<>();

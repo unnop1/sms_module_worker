@@ -35,6 +35,9 @@ public class KafkaConsumerService {
     @Value("${smsgateway.is_skip_send}")
     private boolean isSkipSendSms=false;
 
+    @Value("${spring.rabbitmq.exchange-name}")
+    private String exchangeSmsGateway;
+
     private Integer MaxRetrySendSmsCount = 3;  
 
     @Autowired
@@ -206,8 +209,7 @@ public class KafkaConsumerService {
                             for (int i = 0; i < phoneNumberSendSms.size();i++){
                                 DataSmsMessage smsData = new DataSmsMessage();
                                 smsData.setMessage(smsMessage);
-                                // smsData.setSystemTransRef(systemTransRef);
-                                smsData.setSystemTransRef("f52888f8-82c5-11ee-b962-0242ac120512");
+                                smsData.setSystemTransRef(systemTransRef);
                                 smsData.setTarget(phoneNumberSendSms.get(i));
                                 smsData.setSource("my");
                                 smsData.setRequestDate(DateTime.getRequestDateUtcNow());
@@ -228,7 +230,7 @@ public class KafkaConsumerService {
                             if(!isSkipSendSms){
                                 for (int sendSmsCount = 1; sendSmsCount <= MaxRetrySendSmsCount ; sendSmsCount++) {
                                     try{
-                                        smsConditionService.publish("RtcSmsBatchEx","" , sendSmsData);
+                                        smsConditionService.publish(exchangeSmsGateway,"" , sendSmsData);
                                         Timestamp sendDate = DateTime.getTimeStampNow(); 
                                         SmsGatewayEntity updateInfo = new SmsGatewayEntity();
                                         updateInfo.setIs_Status(1);
