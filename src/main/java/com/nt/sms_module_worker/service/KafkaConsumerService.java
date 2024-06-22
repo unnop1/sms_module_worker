@@ -54,9 +54,11 @@ public class KafkaConsumerService {
     
     @KafkaListener(
         autoStartup="true",
-        // {"orderType": "new", "payload":"123"}
-        // topics = {"New", "Suspend", "Reconnect", "Change_Package", "Add_Package", "Delete_Package", "Topup_Recharge", "Package_Expire"}, 
-        topics = {"NEW", "SUSPEND", "RECONNECT", "CHANGEPACKAGE", "ADDPACKAGE", "DELETEPACKAGE", "TOPUPRECHARGE", "PACKAGEEXPIRE"}, 
+        // PRODUCTION
+        topics = {"NEW","SUSPEND","PACKAGEEXPIRE","RECONNECT","CHANGEPACKAGE","ADDPACKAGE","DELETEPACKAGE","TOPUPRECHARGE"}, 
+
+        // DEV
+        // topics = {"PACKAGEEXPIRE","CHANGEOWNER","BULKPREPROVISIONING","VARIETYSERVICE","SERVICECREDITLIMIT","SWAPPREPAIDTOPOSTPAID","CONTRACTMANAGEMENT","EXTENDEXPIRATIONDATE","CREDITLIMIT","NEW","SUSPEND","RECONNECT","TERMINATE","CHANGEPACKAGE","DELETEPACKAGE","TOPUPRECHARGE","ADDPACKAGE","CHANGEMSISDN"}, 
         groupId = "sms_module.worker"
     )
     public void listening(@Payload String message, @Header(KafkaHeaders.RECEIVED_TOPIC) String topic) throws Exception {
@@ -264,7 +266,7 @@ public class KafkaConsumerService {
                             smsMisMatchConditionGw.setOrderType(receivedData.getOrderType().toUpperCase());
                             smsMisMatchConditionGw.setOrder_type_mainID(orderTypeData.getMainID());
                             smsMisMatchConditionGw.setIs_Status(2);
-                            smsMisMatchConditionGw.setRemark("consition miss match");
+                            smsMisMatchConditionGw.setRemark("condition miss match");
                             smsMisMatchConditionGw.setPayloadMQ(messageMqClob);
                             smsMisMatchConditionGw.setReceive_Date(receiveDate);
                             smsMisMatchConditionGw.setTransaction_id(receivedData.getOrderID());
