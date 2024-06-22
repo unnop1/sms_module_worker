@@ -283,7 +283,7 @@ public class Condition {
                         // System.out.println("startTimeStr:"+startTimeStr);
                         // System.out.println("endTimeStr:"+endTimeStr);
                         LocalDateTime startTime = DateTime.convertDateTime(startTimeStr);
-                        LocalDateTime endTime = DateTime.convertDateTime(endTimeStr);
+                        LocalDateTime endTime = DateTime.convertDateTime(endTimeStr, false);
 
                         if (doDateTimeOperation(">=", dataTimestamp, startTime)&&
                             doDateTimeOperation("<=", dataTimestamp, endTime)) {

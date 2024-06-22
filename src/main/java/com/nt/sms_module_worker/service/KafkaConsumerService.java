@@ -159,7 +159,7 @@ public class KafkaConsumerService {
                             String smsMessage = MapString.mapPatternToSmsMessage(conditionMessage, jsonData);
                             SmsGatewayEntity smsMatchConditionGw = new SmsGatewayEntity();
                             Timestamp createdDate = DateTime.getTimeStampNow();
-                            String systemTransRef = getTransactionID(createdDate);
+                            String systemTransRef = receivedData.getOrderID();
                             
                             if (!isCheckedPDPA){
                                 Boolean mustCheckPDPA = pdpaService.mustCheckPDPA(condition);

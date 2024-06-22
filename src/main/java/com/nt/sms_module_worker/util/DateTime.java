@@ -62,6 +62,24 @@ public class DateTime {
         return LocalDateTime.parse(input, formatter);
     }
 
+    public static final LocalDateTime convertDateTime(String input, boolean isBeginOfDay) {
+        String dateFormat = "yyyy-MM-dd";
+        String timeStampFormat = "yyyy-MM-dd HH:mm:ss";
+        boolean isSimpleFormat = validateDate(input, dateFormat);
+        
+        if (isSimpleFormat) {
+            input = String.format("%s %s", input, "00:00:00");
+            if(!isBeginOfDay) {
+                input = String.format("%s %s", input, "23:59:59");
+            }
+        } else if (isIsoDateTime(input)) {
+            input = convertIsoToCustomFormat(input);
+        }
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(timeStampFormat);
+        return LocalDateTime.parse(input, formatter);
+    }
+
     public static String convertIsoToCustomFormat(String isoDateTimeString) {
         try {
             ZonedDateTime zdt = ZonedDateTime.parse(isoDateTimeString, DateTimeFormatter.ISO_DATE_TIME);
