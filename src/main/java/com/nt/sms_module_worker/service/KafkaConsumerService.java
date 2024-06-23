@@ -209,7 +209,7 @@ public class KafkaConsumerService {
                             for (int i = 0; i < phoneNumberSendSms.size();i++){
                                 DataSmsMessage smsData = new DataSmsMessage();
                                 smsData.setMessage(smsMessage);
-                                smsData.setSystemTransRef(systemTransRef);
+                                smsData.setSystemTransRef(String.format("%s-%s", systemTransRef, DateTime.getRequestDateUtcNow().toString()));
                                 smsData.setTarget(phoneNumberSendSms.get(i));
                                 smsData.setSource("my");
                                 smsData.setRequestDate(DateTime.getRequestDateUtcNow());
