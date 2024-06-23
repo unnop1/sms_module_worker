@@ -153,6 +153,10 @@ public class KafkaConsumerService {
                     }
                     for (ConfigConditionsEntity condition : smsConditions) {
                         JSONObject jsonData = new JSONObject(messageMq);
+                        if(!pdpaService.mustInRangeTime(condition)){
+                                continue;
+                        }
+
                         if (smsConditionService.checkSendSms(condition, jsonData)){
                         // if(true){
                             // Check PDPA

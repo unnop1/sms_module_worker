@@ -31,19 +31,32 @@ public class PDPAService {
             if(condition.getIs_pdpa().equals(0) || isSkipCheckPDPA){
                 return false; // Skip check PDPA
             }
-            else{
-                if (condition.getIs_period_time()!= null){
-                    if (condition.getIs_period_time().equals(1)){
-                        if (DateTime.isCurrentTimeInRange(condition.getTime_Start(), condition.getTime_End())){
-                            return true;
-                        }
-                    }else{
-                        return true;
-                    }
-                }
-            }
+            // else{
+            //     if (condition.getIs_period_time()!= null){
+            //         if (condition.getIs_period_time().equals(1)){
+            //             if (DateTime.isCurrentTimeInRange(condition.getTime_Start(), condition.getTime_End())){
+            //                 return true;
+            //             }
+            //         }else{
+            //             return true;
+            //         }
+            //     }
+            // }
         }
         return false; // Skip check PDPA
+    }
+
+    public boolean mustInRangeTime(ConfigConditionsEntity condition){
+        if (condition.getIs_period_time()!= null){
+            if (condition.getIs_period_time().equals(1)){
+                if (DateTime.isCurrentTimeInRange(condition.getTime_Start(), condition.getTime_End())){
+                    return true;
+                }
+            }else{
+                return true;
+            }
+        }
+        return false;
     }
 
     public ConsentResp getPDPAConsent(String phoneNumber){
