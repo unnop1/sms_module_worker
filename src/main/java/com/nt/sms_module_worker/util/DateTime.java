@@ -47,7 +47,7 @@ public class DateTime {
         return LocalDateTime.now();
     }
 
-    public static final LocalDateTime convertDateTime(String input) {
+    public static final LocalDateTime convertDateTime(String input) throws Exception {
         String dateFormat = "yyyy-MM-dd";
         String timeStampFormat = "yyyy-MM-dd HH:mm:ss";
         boolean isSimpleFormat = validateDate(input, dateFormat);
@@ -62,50 +62,72 @@ public class DateTime {
         return LocalDateTime.parse(input, formatter);
     }
 
-    public static final LocalDateTime convertDateTime(String input, boolean isBeginOfDay) {
+    
+    public static final LocalDateTime convertDateTime(String input, boolean isBeginOfDay) throws Exception {
         String dateFormat = "yyyy-MM-dd";
         String timeStampFormat = "yyyy-MM-dd HH:mm:ss";
         boolean isSimpleFormat = validateDate(input, dateFormat);
         
         if (isSimpleFormat) {
-            input = String.format("%s %s", input, "00:00:00");
-            if(!isBeginOfDay) {
+            if (isBeginOfDay) {
+                input = String.format("%s %s", input, "00:00:00");
+            } else {
                 input = String.format("%s %s", input, "23:59:59");
             }
         } else if (isIsoDateTime(input)) {
             input = convertIsoToCustomFormat(input);
+        } else {
+            throw new Exception("Error convert DateTime");
         }
-
+    
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(timeStampFormat);
         return LocalDateTime.parse(input, formatter);
     }
-
-    public static String convertIsoToCustomFormat(String isoDateTimeString) {
-        try {
-            ZonedDateTime zdt = ZonedDateTime.parse(isoDateTimeString, DateTimeFormatter.ISO_DATE_TIME);
-            LocalDateTime ldt = zdt.toLocalDateTime();
-            DateTimeFormatter customFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-            return ldt.format(customFormatter);
-        } catch (DateTimeParseException e) {
-            throw new RuntimeException("Error parsing the ISO datetime string", e);
-        }
+    
+    // Placeholder method to validate the date format
+    public static boolean validateDate(String dateStr, String dateFormat) {
+        // Implement validation logic here
+        return dateStr.matches("\\d{4}-\\d{2}-\\d{2}");
+    }
+    
+    // Placeholder method to check if the input is in ISO date-time format
+    public static boolean isIsoDateTime(String dateTimeStr) {
+        // Implement validation logic here
+        return dateTimeStr.matches("\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}");
+    }
+    
+    // Placeholder method to convert ISO date-time to custom format
+    public static String convertIsoToCustomFormat(String isoDateTimeStr) {
+        // Implement conversion logic here
+        return isoDateTimeStr.replace("T", " ");
     }
 
-    public static boolean isIsoDateTime(String datetimeString) {
-        String isoDateTimePattern = "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?Z?$";
-        return Pattern.matches(isoDateTimePattern, datetimeString);
-    }
+    // public static String convertIsoToCustomFormat(String isoDateTimeString) {
+    //     try {
+    //         ZonedDateTime zdt = ZonedDateTime.parse(isoDateTimeString, DateTimeFormatter.ISO_DATE_TIME);
+    //         LocalDateTime ldt = zdt.toLocalDateTime();
+    //         DateTimeFormatter customFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    //         return ldt.format(customFormatter);
+    //     } catch (DateTimeParseException e) {
+    //         throw new RuntimeException("Error parsing the ISO datetime string", e);
+    //     }
+    // }
 
-    public static boolean validateDate(String inputDate, String format) {
-        SimpleDateFormat sdf = new SimpleDateFormat(format);
-        sdf.setLenient(false); // Disable lenient parsing (strict parsing)
-        try {
-            sdf.parse(inputDate); // Try to parse the input date
-            return true; // If parsing succeeds, return true
-        } catch (ParseException e) {
-            return false; // If parsing fails, return false
-        }
-    }
+    // public static boolean isIsoDateTime(String datetimeString) {
+    //     String isoDateTimePattern = "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?Z?$";
+    //     return Pattern.matches(isoDateTimePattern, datetimeString);
+    // }
+
+    // public static boolean validateDate(String inputDate, String format) {
+    //     SimpleDateFormat sdf = new SimpleDateFormat(format);
+    //     sdf.setLenient(false); // Disable lenient parsing (strict parsing)
+    //     try {
+    //         sdf.parse(inputDate); // Try to parse the input date
+    //         return true; // If parsing succeeds, return true
+    //     } catch (ParseException e) {
+    //         return false; // If parsing fails, return false
+    //     }
+    // }
     public static final Boolean isCurrentTimeInRange(String startInput, String endInput) {
         // Parse the start and end times
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");

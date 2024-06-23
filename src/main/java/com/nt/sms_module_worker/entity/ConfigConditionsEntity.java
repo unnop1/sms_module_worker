@@ -17,7 +17,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-@Table (name = "CONFIG_CONDITIONS", schema="${replace_schema}")//"reddbsms"
+@Table (name = "CONFIG_CONDITIONS", schema="${replace_schema}")
 public class ConfigConditionsEntity {
         
         @Id
@@ -44,13 +44,11 @@ public class ConfigConditionsEntity {
         @Column(name = "MESSAGE", unique = false,nullable = true)
         private String message = null;
 
-        @JsonBackReference
         @Column(name = "CONDITIONS_OR", unique = false,nullable = true)
-        private Clob conditions_or = null;
+        private String conditions_or = null;
 
-        @JsonBackReference
         @Column(name = "CONDITIONS_AND", unique = false,nullable = true)
-        private Clob conditions_and = null;
+        private String conditions_and = null;
 
         @Column(name = "CREATED_DATE", unique = false,nullable = true)
         private Timestamp created_Date = null;

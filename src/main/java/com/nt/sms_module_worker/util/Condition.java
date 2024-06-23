@@ -70,6 +70,8 @@ public class Condition {
         // Date String operations
         if(isDateFormatData(orConfValue)){
             try{
+                System.out.println("dataValue:" +dataValue );
+                System.out.println("orConfValue:" +orConfValue );
                 LocalDateTime dataDateTime = DateTime.convertDateTime(dataValue);
                 LocalDateTime conditionDateTime = DateTime.convertDateTime(orConfValue);
                 return doDateTimeOperation(operator, dataDateTime, conditionDateTime);
@@ -79,7 +81,7 @@ public class Condition {
         }
 
         // Default String operations
-        switch (operator) {
+        switch (operator.toLowerCase()) {
             case "!=":
                 return !dataValue.equals(orConfValue);
             case "=":
@@ -231,7 +233,7 @@ public class Condition {
     }
 
 
-    public static final boolean doArrayOperation(String operation_type, String conditionKey,JSONObject jsonData, JSONArray conditionArray){
+    public static final boolean doArrayOperation(String operation_type, String conditionKey,JSONObject jsonData, JSONArray conditionArray) throws Exception{
         String dataType = Condition.checkFieldType(jsonData, conditionKey);
         System.out.println("================================ doArrayOperation ===========================================");
         System.out.println(" conditionKey : " + conditionKey);
@@ -244,7 +246,7 @@ public class Condition {
         switch (dataType) {
             case "String":
                 String dataStr = jsonData.getString(conditionKey);
-                switch ( operation_type) {
+                switch ( operation_type.toLowerCase()) {
                     case "where in":
                         for (int i = 0; i < conditionArray.length(); i++) {
                             Object conditionObject = conditionArray.get(i);
@@ -297,7 +299,7 @@ public class Condition {
                 return found;
             case "Integer":
                 Integer dataInt = jsonData.getInt(conditionKey);
-                switch ( operation_type) {
+                switch ( operation_type.toLowerCase()) {
                     case "where in":
                     for (int i = 0; i < conditionArray.length(); i++) {
                         Object conditionObject = conditionArray.get(i);
@@ -346,7 +348,7 @@ public class Condition {
         }
     }
 
-    public static final Boolean doCondition(JSONObject jsonData, String conditionKey, JSONObject orValueConfig){
+    public static final Boolean doCondition(JSONObject jsonData, String conditionKey, JSONObject orValueConfig) throws Exception{
         // check condition
         String configValueType = Condition.checkFieldType(orValueConfig, "value");
         System.out.println("================================doCondition================================");
@@ -389,7 +391,7 @@ public class Condition {
         }
     }
 
-    public static boolean checkOrConditionValueConfigArray(String conditionKey, JSONObject jsonData, JSONObject andConf){
+    public static boolean checkOrConditionValueConfigArray(String conditionKey, JSONObject jsonData, JSONObject andConf) throws Exception{
         Boolean isMatchArrayCondition = false;
         Boolean isMatchAllData = true;
         JSONArray jsonArray = jsonData.getJSONArray(conditionKey);
@@ -405,7 +407,7 @@ public class Condition {
                 }
                 
                 JSONObject valueConfig = andConf.getJSONObject(conditionKey);
-                String operationType = valueConfig.getString("operation_type");
+                String operationType = valueConfig.getString("operation_type").toUpperCase();
                 if (operationType.equals("WHERE NOT IN")){
                     isMatchAllData = false;
                 }
@@ -435,7 +437,7 @@ public class Condition {
         return isMatchArrayCondition;
     }
 
-    public static boolean checkAndConditionValueConfigArray(String conditionKey, JSONObject jsonData, JSONObject andConf){
+    public static boolean checkAndConditionValueConfigArray(String conditionKey, JSONObject jsonData, JSONObject andConf) throws Exception{
         Boolean isMatchArrayCondition = false;
         Boolean isMatchAllData = false;
         JSONArray jsonArray = jsonData.getJSONArray(conditionKey);
@@ -451,7 +453,7 @@ public class Condition {
                 }
                 
                 JSONObject valueConfig = andConf.getJSONObject(conditionKey);
-                String operationType = valueConfig.getString("operation_type");
+                String operationType = valueConfig.getString("operation_type").toUpperCase();
                 if (operationType.equals("WHERE NOT IN")){
                     isMatchAllData = true;
                 }
@@ -481,7 +483,7 @@ public class Condition {
         return isMatchArrayCondition;
     }
     
-    public static boolean checkOrCondition(JSONObject orConf, JSONObject jsonData){
+    public static boolean checkOrCondition(JSONObject orConf, JSONObject jsonData) throws Exception{
     
         // check or
         boolean isMatchCondition = false;
@@ -528,7 +530,7 @@ public class Condition {
         return isMatchCondition;
     }
     
-    public static final boolean checkAndCondition(JSONObject andConf, JSONObject jsonData){
+    public static final boolean checkAndCondition(JSONObject andConf, JSONObject jsonData) throws Exception{
     
         // check or
         boolean isMatchCondition = true;
