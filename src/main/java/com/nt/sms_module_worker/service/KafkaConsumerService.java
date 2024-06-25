@@ -16,6 +16,7 @@ import com.nt.sms_module_worker.entity.ConfigConditionsEntity;
 import com.nt.sms_module_worker.entity.FixedPhoneNumberEntity;
 import com.nt.sms_module_worker.entity.OrderTypeEntity;
 import com.nt.sms_module_worker.entity.SmsGatewayEntity;
+import com.nt.sms_module_worker.log.LogFile;
 import com.nt.sms_module_worker.model.dao.pdpa.consent.ConsentResp;
 import java.sql.Clob;
 import java.sql.SQLException;
@@ -170,8 +171,9 @@ public class KafkaConsumerService {
                             if (!isCheckedPDPA){
                                 Boolean mustCheckPDPA = pdpaService.mustCheckPDPA(condition);
                                 isCheckedPDPA = true;
-                                if (!mustCheckPDPA){
+                                if (mustCheckPDPA){
                                     consentPDPA = pdpaService.getPDPAConsent(receivedData.getMsisdn());
+                                    LogFile.logMessage("KafkaConsumerService", "pdpa_consent", consentPDPA);
                                 }
                             }
                             

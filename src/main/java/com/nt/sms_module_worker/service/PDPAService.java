@@ -30,6 +30,8 @@ public class PDPAService {
         if (condition.getIs_pdpa()!= null){
             if(condition.getIs_pdpa().equals(0) || isSkipCheckPDPA){
                 return false; // Skip check PDPA
+            }else{
+                return true;
             }
             // else{
             //     if (condition.getIs_period_time()!= null){
