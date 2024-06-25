@@ -11,6 +11,9 @@ public class RefreshTokenResp {
     @JsonProperty("code")
     private Integer code;
 
+    @JsonProperty("statusCode")
+    private Integer statusCode;
+
     @JsonProperty("message")
     private String message;
 

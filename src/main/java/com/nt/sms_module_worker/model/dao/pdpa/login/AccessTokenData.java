@@ -14,4 +14,7 @@ public class AccessTokenData {
 
     @JsonProperty("RefreshToken")
     private String RefreshToken;
+
+    @JsonProperty("exp_in")
+    private Integer expIn;
 }
