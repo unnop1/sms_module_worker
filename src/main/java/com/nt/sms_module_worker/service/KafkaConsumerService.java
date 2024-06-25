@@ -175,6 +175,7 @@ public class KafkaConsumerService {
                                     consentPDPA = pdpaService.getPDPAConsent(receivedData.getMsisdn());
                                     LogFile.logMessage("KafkaConsumerService", "pdpa_consent", consentPDPA);
                                 }
+                                LogFile.logMessageTest("KafkaConsumerService", "pdpa_consent_test", "isCheckedPDPA:"+isCheckedPDPA + ", consentPDPA:"+ consentPDPA.toString());
                             }
                             
                             if(consentPDPA != null){

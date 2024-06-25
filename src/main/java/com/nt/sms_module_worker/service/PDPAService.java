@@ -17,6 +17,9 @@ public class PDPAService {
     @Value("${pdpa.purpose_id}")
     private String purposeID;
 
+    @Value("${pdpa.consent_id}")
+    private String consentID;
+
     @Value("${pdpa.is-skip-pdpa}")
     private boolean isSkipCheckPDPA;
 
@@ -62,7 +65,7 @@ public class PDPAService {
     }
 
     public ConsentResp getPDPAConsent(String phoneNumber){
-        ConsentResp resp = client.GetConsentPDPAByPhoneNumber(purposeID, phoneNumber);
+        ConsentResp resp = client.GetConsentPDPAByPhoneNumber(consentID, purposeID, phoneNumber);
         return resp;
     }
     
