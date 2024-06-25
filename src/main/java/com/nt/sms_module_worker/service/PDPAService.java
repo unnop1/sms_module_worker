@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 import com.nt.sms_module_worker.client.PDPAClient;
 import com.nt.sms_module_worker.entity.ConfigConditionsEntity;
 import com.nt.sms_module_worker.model.dao.pdpa.consent.ConsentResp;
+import com.nt.sms_module_worker.model.dao.pdpa.login.RefreshTokenResp;
 import com.nt.sms_module_worker.util.DateTime;
 
 import lombok.Getter;
@@ -19,6 +20,9 @@ public class PDPAService {
 
     @Value("${pdpa.consent_id}")
     private String consentID;
+
+    @Value("${pdpa.refresh_token}")
+    private String refreshToken;
 
     @Value("${pdpa.is-skip-pdpa}")
     private boolean isSkipCheckPDPA;
@@ -65,7 +69,8 @@ public class PDPAService {
     }
 
     public ConsentResp getPDPAConsent(String phoneNumber){
-        ConsentResp resp = client.GetConsentPDPAByPhoneNumber(consentID, purposeID, phoneNumber);
+        RefreshTokenResp tokenResp = client.refreshToken(refreshToken);
+        ConsentResp resp = client.GetConsentPDPAByPhoneNumber(consentID, purposeID, phoneNumber, tokenResp.getData().getAccessToken());
         return resp;
     }
     

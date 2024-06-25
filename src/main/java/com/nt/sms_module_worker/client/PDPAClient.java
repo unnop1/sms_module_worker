@@ -17,11 +17,11 @@ public class PDPAClient {
         this.host = host;
     }
 
-    public RefreshTokenResp RefreshToken(String refreshToken){
+    public RefreshTokenResp refreshToken(String refreshToken){
         RefreshTokenResp respData = null;
         try {
             URL url = new URL(String.format(
-                    "http://%s/portal/sdk/token",
+                    "https://%s/portal/sdk/token",
                     host
                 )
             );
@@ -64,7 +64,7 @@ public class PDPAClient {
     }
 
 
-    public ConsentResp GetConsentPDPAByPhoneNumber(String consentID,String purposeID , String phoneNumber){
+    public ConsentResp GetConsentPDPAByPhoneNumber(String consentID,String purposeID , String phoneNumber, String token){
         ConsentResp respData = null;
         try {
             URL url = new URL(String.format(
@@ -77,6 +77,9 @@ public class PDPAClient {
             );
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
+
+            // Set the Authorization header
+            connection.setRequestProperty("Authorization", token);
 
             int responseCode = connection.getResponseCode();
             
