@@ -187,6 +187,7 @@ public class KafkaConsumerService {
                                     createdDate = DateTime.getTimeStampNow(); 
                                     SmsGatewayEntity smsNotEnableConditionGw = new SmsGatewayEntity();
                                     smsNotEnableConditionGw.setPhoneNumber(receivedData.getMsisdn());
+                                    smsNotEnableConditionGw.setOrder_type_mainID(orderTypeData.getMainID());
                                     smsNotEnableConditionGw.setOrderType(receivedData.getOrderType().toUpperCase());
                                     smsNotEnableConditionGw.setIs_Status(4);
                                     smsNotEnableConditionGw.setRefID(condition.getRefID());
