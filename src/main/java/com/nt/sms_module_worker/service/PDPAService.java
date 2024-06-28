@@ -69,8 +69,11 @@ public class PDPAService {
     }
 
     public ConsentResp getPDPAConsent(String phoneNumber){
+        ConsentResp resp= null;
         RefreshTokenResp tokenResp = client.refreshToken(refreshToken);
-        ConsentResp resp = client.GetConsentPDPAByPhoneNumber(consentID, purposeID, phoneNumber, tokenResp.getData().getAccessToken());
+        if (tokenResp != null){
+            resp = client.GetConsentPDPAByPhoneNumber(consentID, purposeID, phoneNumber, tokenResp.getData().getAccessToken());
+        }
         return resp;
     }
     
