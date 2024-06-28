@@ -6,6 +6,7 @@ import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.stereotype.Component;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.nt.sms_module_worker.model.dto.distribute.DataSmsMessage;
 import com.nt.sms_module_worker.model.dto.distribute.ReceivedData;
@@ -180,6 +181,9 @@ public class KafkaConsumerService {
                             
                             if(consentPDPA != null){
                                 if(!consentPDPA.getHaveConsent()){
+                                    ObjectMapper pdpaMapper = new ObjectMapper();
+                                    objectMapper.enable(SerializationFeature.INDENT_OUTPUT); // Optional: for pretty print
+                                    String pdpaJsonStr = pdpaMapper.writeValueAsString(consentPDPA);
                                     createdDate = DateTime.getTimeStampNow(); 
                                     SmsGatewayEntity smsNotEnableConditionGw = new SmsGatewayEntity();
                                     smsNotEnableConditionGw.setPhoneNumber(receivedData.getMsisdn());
@@ -190,6 +194,7 @@ public class KafkaConsumerService {
                                     smsNotEnableConditionGw.setPayloadMQ(messageMqClob);
                                     smsNotEnableConditionGw.setReceive_Date(receiveDate);
                                     smsNotEnableConditionGw.setCreated_Date(createdDate);
+                                    smsNotEnableConditionGw.setConsentPDPA(pdpaJsonStr);
                                     smsNotEnableConditionGw.setRemark("ไม่ยอมรับ pdpa กับ orderType : "+orderTypeData.getOrderTypeName());
                                     smsGatewayService.createConditionalMessage(smsNotEnableConditionGw);
                                     return;

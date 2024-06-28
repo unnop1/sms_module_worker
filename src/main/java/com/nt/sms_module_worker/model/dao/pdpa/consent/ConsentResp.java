@@ -22,8 +22,8 @@ public class ConsentResp {
     @JsonProperty("statusCode")
     private Integer statusCode;
 
-    @JsonProperty("message")
-    private String message;
+    @JsonProperty("massage")
+    private String massage;
 
     @JsonProperty("haveConsent")
     private Boolean haveConsent;

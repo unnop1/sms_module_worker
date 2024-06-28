@@ -250,7 +250,11 @@ public class Condition {
         System.out.println(" operation_type : " + operation_type);
         System.out.println(" dataType: " + dataType);
         System.out.println("=============================================================================================");
-        
+        LogFile.logMessageTest("Condition", "debug_condition","================================doCondition================================");
+        LogFile.logMessageTest("Condition", "debug_condition","conditionKey:"+conditionKey);
+        LogFile.logMessageTest("Condition", "debug_condition","dataType:"+dataType);
+        LogFile.logMessageTest("Condition", "debug_condition","operation_type:"+operation_type);
+        System.out.println("===========================================================================");
         Boolean found = false;
         
         switch (dataType) {
@@ -262,6 +266,7 @@ public class Condition {
                             Object conditionObject = conditionArray.get(i);
                             String elementType = checkTypeObject(conditionObject, conditionKey);
                             // System.out.println("conditionKey: "+conditionKey+" ,  elementType : " + elementType);
+                            LogFile.logMessageTest("Condition", "debug_condition","conditionKey: "+conditionKey+" ,  elementType : " + elementType);
                             switch ( elementType ) {
                                 case "String":
                                     String conditionStr = conditionArray.getString(i);
@@ -464,8 +469,10 @@ public class Condition {
             for (int i = 0; i < jsonArray.length(); i++){
                 JSONObject dataJson = jsonArray.getJSONObject(i); // first element only
                 System.out.println("next array data==> "+dataJson.toString());
+                LogFile.logMessageTest("KafkaConsumerService", "debug_condition","next array data==> "+dataJson.toString());
                 JSONObject andConditionFound = andConf.optJSONObject(conditionKey);
                 System.out.println("next andConditionFound data==> "+andConditionFound.toString());
+                LogFile.logMessageTest("KafkaConsumerService", "debug_condition","next andConditionFound data==> "+andConditionFound.toString());
                 if(andConditionFound == null || dataJson == null){
                     continue;
                 }
@@ -480,16 +487,20 @@ public class Condition {
                     JSONObject subCondition = values.getJSONObject(j);
                     // System.out.println("next array data==> "+dataJson.toString());
                     System.out.println(" conditionKey==> "+conditionKey);
+                    LogFile.logMessageTest("KafkaConsumerService", "debug_condition"," conditionKey==> "+conditionKey);
                     System.out.println("next subCondition==> "+subCondition.toString() );
+                    LogFile.logMessageTest("KafkaConsumerService", "debug_condition","next subCondition==> "+subCondition.toString()  );
                     if (!isMatchAllData){
                         isMatchArrayCondition = checkAndCondition(subCondition, dataJson);
                         System.out.println("isMatchArrayCondition==> "+isMatchArrayCondition);
+                        LogFile.logMessageTest("KafkaConsumerService", "debug_condition","isMatchArrayCondition==> "+isMatchArrayCondition );
                         if (isMatchArrayCondition){
                             return true;
                         }
                     }else{
                         isMatchArrayCondition = checkOrCondition(subCondition, dataJson);
                         System.out.println("isMatchArrayCondition==> "+isMatchArrayCondition);
+                        LogFile.logMessageTest("KafkaConsumerService", "debug_condition","isMatchArrayCondition==> "+isMatchArrayCondition);
                         if (!isMatchArrayCondition){
                             return false;
                         }
@@ -509,6 +520,7 @@ public class Condition {
             String orConfType = Condition.checkFieldType(orConf, conditionKey);
             String dataType = Condition.checkFieldType(jsonData, conditionKey);
             System.out.println(conditionKey+ " have orconf type "+ orConfType +" and data type "+ dataType);
+            LogFile.logMessageTest("KafkaConsumerService", "debug_condition",conditionKey+ " have orconf type "+ orConfType +" and data type "+ dataType);
             if (dataType == "NotFound"){
                 return true;
             }else if(orConfType == "ValueConfig"){
@@ -525,6 +537,7 @@ public class Condition {
                     isMatchCondition = doCondition(jsonData, conditionKey, orValueConfig);
                 }
                 System.out.println(conditionKey+ " have orconf type "+ orConfType +" and data type "+ dataType + " isMatchCondition :"+ isMatchCondition );
+                LogFile.logMessageTest("KafkaConsumerService", "debug_condition",conditionKey+ " have orconf type "+ orConfType +" and data type "+ dataType + " isMatchCondition :"+ isMatchCondition);
                 if (isMatchCondition){
                     return true;
                 }
@@ -532,6 +545,8 @@ public class Condition {
                 // Sub Object
                 if (dataType == "JSONArray"){
                     System.out.println("OR Condition array");
+                    LogFile.logMessageTest("KafkaConsumerService", "debug_condition","OR Condition array");
+                
                     boolean isMatchArrayCondition = checkOrConditionValueConfigArray(conditionKey, jsonData, orConf);
                     if (isMatchArrayCondition){
                         return true;

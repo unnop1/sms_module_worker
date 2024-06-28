@@ -69,10 +69,10 @@ public class PDPAService {
         return false;
     }
 
-    public ConsentResp getPDPAConsent(String phoneNumber){
+    public ConsentResp getPDPAConsent(String phoneNumber) throws Exception{
         ConsentResp resp= null;
         RefreshTokenResp tokenResp = client.refreshToken(refreshToken);
-        LogFile.logMessageTest("KafkaConsumerService", "debug_pdpa", tokenResp.getMessage());
+        // LogFile.logMessageTest("KafkaConsumerService", "debug_pdpa", tokenResp.getMessage());
         if (tokenResp != null){
             resp = client.GetConsentPDPAByPhoneNumber(consentID, purposeID, phoneNumber, tokenResp.getData().getAccessToken());
         }

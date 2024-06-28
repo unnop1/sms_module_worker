@@ -21,6 +21,7 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.nt.sms_module_worker.entity.ConfigConditionsEntity;
+import com.nt.sms_module_worker.log.LogFile;
 import com.nt.sms_module_worker.model.dto.distribute.SendSmsGatewayData;
 import com.nt.sms_module_worker.repo.SmsConditionRepo;
 import com.nt.sms_module_worker.util.Condition;
@@ -78,6 +79,7 @@ public class SmsConditionService {
                     System.out.println("And round:"+i);
                     if (!Condition.checkAndCondition(conf, jsonData)){
                         System.out.println("return not match and");
+                        LogFile.logMessageTest("KafkaConsumerService", "debug_condition","return not match and");
                         return false;
                     }
                 }
