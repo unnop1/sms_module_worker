@@ -68,6 +68,14 @@ public class Condition {
         return false;
     }
 
+    public static final boolean isBooleanData(String confStr) {
+        if (confStr == null) {
+            return false;
+        }
+        String normalizedStr = confStr.trim().toLowerCase();
+        return "true".equals(normalizedStr) || "false".equals(normalizedStr);
+    }
+
     public static final boolean doStringOperation(String operator,String dataValue, String orConfValue){
         // Date String operations
         if(isDateFormatData(orConfValue)){
@@ -88,6 +96,11 @@ public class Condition {
                 System.out.println("error converting date time : " + e.getMessage());
                 LogFile.logMessageTest("Condition", "debug_condition","error converting date time : " + e.getMessage() );
             }
+        }
+
+        // Default Boolean operations
+        if(isBooleanData(orConfValue)){
+            return doBooleanOperation(operator, Boolean.valueOf(dataValue), Boolean.valueOf(orConfValue));
         }
 
         // Default String operations
