@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 
 import com.nt.sms_module_worker.client.PDPAClient;
 import com.nt.sms_module_worker.entity.ConfigConditionsEntity;
+import com.nt.sms_module_worker.log.LogFile;
 import com.nt.sms_module_worker.model.dao.pdpa.consent.ConsentResp;
 import com.nt.sms_module_worker.model.dao.pdpa.login.RefreshTokenResp;
 import com.nt.sms_module_worker.util.DateTime;
@@ -71,6 +72,7 @@ public class PDPAService {
     public ConsentResp getPDPAConsent(String phoneNumber){
         ConsentResp resp= null;
         RefreshTokenResp tokenResp = client.refreshToken(refreshToken);
+        LogFile.logMessageTest("KafkaConsumerService", "debug_pdpa", tokenResp.getMessage());
         if (tokenResp != null){
             resp = client.GetConsentPDPAByPhoneNumber(consentID, purposeID, phoneNumber, tokenResp.getData().getAccessToken());
         }

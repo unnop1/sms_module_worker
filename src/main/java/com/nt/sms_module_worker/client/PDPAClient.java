@@ -18,7 +18,7 @@ public class PDPAClient {
     }
 
     public RefreshTokenResp refreshToken(String refreshToken){
-        RefreshTokenResp respData = null;
+        RefreshTokenResp respData = new RefreshTokenResp();
         try {
             URL url = new URL(String.format(
                     "https://%s/portal/sdk/token",
@@ -59,6 +59,7 @@ public class PDPAClient {
             }
         } catch (Exception e) {
             e.printStackTrace();
+            respData.setMessage(e.getMessage());
         }
         return respData;
     }

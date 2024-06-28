@@ -78,7 +78,7 @@ public class LogFile {
             
             String pathLog = jbossDataDir + "/" + path + "/";
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-            String fileName = dateFormat.format(date) + ".json";
+            String fileName = dateFormat.format(date) + ".text";
 
             // Ensure directory exists, create if it doesn't
             File dir = new File(pathLog);
@@ -97,15 +97,7 @@ public class LogFile {
             logger.setUseParentHandlers(false); // Prevents logging to console
             logger.setLevel(Level.INFO);
             fileHandler.setLevel(Level.INFO);
-
-            // Convert log entry to JSON
-            ObjectMapper objectMapper = new ObjectMapper();
-            objectMapper.enable(SerializationFeature.INDENT_OUTPUT); // Optional: for pretty print
-            String logEntryJson = objectMapper.writeValueAsString(messageLog);
-
-            // Append log entry to file
-            File file = new File(pathLog + "/" + fileName);
-            objectMapper.writeValue(file, logEntryJson);
+            logger.info(messageLog);
 
 
             // Close the handler to ensure the log is written

@@ -7,6 +7,8 @@ import java.time.LocalDateTime;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import com.nt.sms_module_worker.log.LogFile;
+
 public class Condition {
 
     public static final String checkFieldType(JSONObject jObj, String fieldName) {
@@ -72,11 +74,19 @@ public class Condition {
             try{
                 System.out.println("dataValue:" +dataValue );
                 System.out.println("orConfValue:" +orConfValue );
+                LogFile.logMessageTest("Condition", "debug_condition","dataValue:"+dataValue);
+                LogFile.logMessageTest("Condition", "debug_condition","operator:"+operator );
+                LogFile.logMessageTest("Condition", "debug_condition","orConfValue:"+orConfValue );
                 LocalDateTime dataDateTime = DateTime.convertDateTime(dataValue);
                 LocalDateTime conditionDateTime = DateTime.convertDateTime(orConfValue);
+
+                LogFile.logMessageTest("Condition", "debug_condition","dataDateTime:"+dataDateTime.toString() );
+                LogFile.logMessageTest("Condition", "debug_condition","conditionDateTime:"+conditionDateTime.toString() );
+                LogFile.logMessageTest("Condition", "debug_condition","doDateTimeOperation:"+doDateTimeOperation(operator, dataDateTime, conditionDateTime));
                 return doDateTimeOperation(operator, dataDateTime, conditionDateTime);
             }catch(Exception e){
                 System.out.println("error converting date time : " + e.getMessage());
+                LogFile.logMessageTest("Condition", "debug_condition","error converting date time : " + e.getMessage() );
             }
         }
 
@@ -151,15 +161,15 @@ public class Condition {
     public static final boolean doDateTimeOperation(String operator,LocalDateTime datetime1, LocalDateTime datetime2){
         switch (operator) {
             case ">":
-                return datetime1.compareTo(datetime2) < 0;
+                return datetime1.isAfter(datetime2);
             case "<":
-                return datetime1.compareTo(datetime2) > 0;
+                return datetime1.isBefore(datetime2);
             case "<=":
-                return datetime1.compareTo(datetime2) <= 0;
+                return datetime1.isBefore(datetime2) || datetime1.equals(datetime2);
             case ">=":
-                return datetime1.compareTo(datetime2) >= 0;
+                return datetime1.isAfter(datetime2) || datetime1.equals(datetime2);
             case "=":
-                return datetime1.compareTo(datetime2) == 0;
+                return datetime1.equals(datetime2);
             default:
                 return false;
         }
@@ -357,6 +367,11 @@ public class Condition {
         System.out.println("jsonData:"+jsonData.toString());
         String operation_type = orValueConfig.getString("operation_type").toLowerCase();
         System.out.println("operation_type:"+operation_type);
+        LogFile.logMessageTest("Condition", "debug_condition","================================doCondition================================");
+        LogFile.logMessageTest("Condition", "debug_condition","ValueConfig:"+orValueConfig.toString());
+        LogFile.logMessageTest("Condition", "debug_condition","checkFieldType:"+configValueType);
+        LogFile.logMessageTest("Condition", "debug_condition","jsonData:"+jsonData.toString());
+        LogFile.logMessageTest("Condition", "debug_condition","operation_type:"+operation_type);
         System.out.println("===========================================================================");
         switch (configValueType) {
             case "Integer":
@@ -401,7 +416,8 @@ public class Condition {
                 JSONObject dataJson = jsonArray.getJSONObject(i); // first element only
                 // System.out.println("next array data==> "+dataJson.toString());
                 JSONObject orConditionFound = andConf.optJSONObject(conditionKey);
-                System.out.println("next orConditionFound data==> "+orConditionFound.toString());
+                // System.out.println("next orConditionFound data==> "+orConditionFound.toString());
+                LogFile.logMessageTest("Condition", "debug_condition","next orConditionFound data==> "+orConditionFound.toString());
                 if(orConditionFound == null || dataJson == null){
                     continue;
                 }
@@ -416,7 +432,9 @@ public class Condition {
                     JSONObject subCondition = values.getJSONObject(j);
                     // System.out.println("next array data==> "+dataJson.toString());
                     System.out.println(" conditionKey==> "+conditionKey);
+                    LogFile.logMessageTest("Condition", "debug_condition"," conditionKey==> "+conditionKey);
                     System.out.println("next subCondition==> "+subCondition.toString() );
+                    LogFile.logMessageTest("Condition", "debug_condition","next subCondition==> "+subCondition.toString() );
                     if (!isMatchAllData){
                         isMatchArrayCondition = checkAndCondition(subCondition, dataJson);
                         System.out.println("isMatchArrayCondition==> "+isMatchArrayCondition);

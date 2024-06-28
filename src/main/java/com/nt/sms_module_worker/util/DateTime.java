@@ -1,10 +1,14 @@
 package com.nt.sms_module_worker.util;
 
 import java.util.regex.Pattern;
+
+import com.nt.sms_module_worker.log.LogFile;
+
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
@@ -47,41 +51,52 @@ public class DateTime {
         return LocalDateTime.now();
     }
 
+    public static LocalDateTime parseDateTime(String dateTimeStr) {
+        try {
+            return LocalDateTime.parse(dateTimeStr, DateTimeFormatter.ISO_DATE_TIME);
+        } catch (Exception e) {
+            return LocalDateTime.ofInstant(Instant.parse(dateTimeStr), ZoneId.systemDefault());
+        }
+    }
+
     public static final LocalDateTime convertDateTime(String input) throws Exception {
         String dateFormat = "yyyy-MM-dd";
-        String timeStampFormat = "yyyy-MM-dd HH:mm:ss";
         boolean isSimpleFormat = validateDate(input, dateFormat);
-        
-        if (isSimpleFormat) {
-            input = String.format("%s %s", input, "00:00:00");
-        } else if (isIsoDateTime(input)) {
-            input = convertIsoToCustomFormat(input);
-        }
 
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(timeStampFormat);
-        return LocalDateTime.parse(input, formatter);
+        if (isSimpleFormat) {
+            // input = String.format("%s %s", input, "00:00:00");
+            LocalDate date = LocalDate.parse(input);
+            LocalDateTime dateTime = date.atStartOfDay();
+            return dateTime;
+        } else if (isIsoDateTime(input)) {
+            return LocalDateTime.parse(input, DateTimeFormatter.ISO_DATE_TIME);
+        } else {
+            throw new DateTimeParseException("Input string does not match expected formats", input, 0);
+        }
     }
 
     
     public static final LocalDateTime convertDateTime(String input, boolean isBeginOfDay) throws Exception {
         String dateFormat = "yyyy-MM-dd";
-        String timeStampFormat = "yyyy-MM-dd HH:mm:ss";
         boolean isSimpleFormat = validateDate(input, dateFormat);
-        
+        LogFile.logMessageTest("Condition", "debug_condition","isSimpleFormat:"+isSimpleFormat);
         if (isSimpleFormat) {
+            LocalDate date = LocalDate.parse(input);
+            
             if (isBeginOfDay) {
-                input = String.format("%s %s", input, "00:00:00");
+                LocalDateTime dateTime = date.atStartOfDay();
+                return dateTime;
             } else {
-                input = String.format("%s %s", input, "23:59:59");
+                LocalDateTime dateTime = date.atTime(LocalTime.MAX);
+                return dateTime;
             }
         } else if (isIsoDateTime(input)) {
-            input = convertIsoToCustomFormat(input);
+            LogFile.logMessageTest("Condition", "debug_condition","isIsoDateTime:"+isIsoDateTime(input));
+            return LocalDateTime.parse(input, DateTimeFormatter.ISO_DATE_TIME);
         } else {
-            throw new Exception("Error convert DateTime");
+            LogFile.logMessageTest("Condition", "debug_condition","Input string does not match expected formats");
+            throw new DateTimeParseException("Input string does not match expected formats", input, 0);
         }
-    
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(timeStampFormat);
-        return LocalDateTime.parse(input, formatter);
     }
     
     // Placeholder method to validate the date format
@@ -91,9 +106,13 @@ public class DateTime {
     }
     
     // Placeholder method to check if the input is in ISO date-time format
-    public static boolean isIsoDateTime(String dateTimeStr) {
-        // Implement validation logic here
-        return dateTimeStr.matches("\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}");
+    private static boolean isIsoDateTime(String dateTimeStr) {
+        try {
+            Instant.parse(dateTimeStr);
+            return true;
+        } catch (DateTimeParseException e) {
+            return false;
+        }
     }
     
     // Placeholder method to convert ISO date-time to custom format
