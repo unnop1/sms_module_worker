@@ -91,10 +91,9 @@ public class SmsConditionService {
                 
                 for (int i = 0; i < jsonSmsOrCon.length(); i++) {
                     JSONObject conf = jsonSmsOrCon.getJSONObject(i);
-                    System.out.println("Or round:"+i);
-                    if (!Condition.checkOrCondition(conf, jsonData)){ 
-                        System.out.println("return not match or");
-                        return false;
+                    if (Condition.checkOrCondition(conf, jsonData)){
+                        LogFile.logMessageTest("KafkaConsumerService", "debug_condition","return match or");
+                        return true;
                     }
                     
                 }

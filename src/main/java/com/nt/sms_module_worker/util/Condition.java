@@ -109,7 +109,7 @@ public class Condition {
                 return !dataValue.equals(orConfValue);
             case "=":
                 return dataValue.equals(orConfValue);
-            case "like":
+            case "LIKE":
                 return dataValue.contains(orConfValue);
             default:
                 return false;
