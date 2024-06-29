@@ -5,6 +5,7 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.HashMap;
 
+import org.apache.kafka.common.protocol.types.Field.Bool;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import java.util.List;
@@ -77,6 +78,7 @@ public class SmsConditionService {
                 for (int i = 0; i < jsonSmsAndCon.length(); i++) {
                     JSONObject conf = jsonSmsAndCon.getJSONObject(i);
                     System.out.println("And round:"+i);
+                    LogFile.logMessageTest("KafkaConsumerService", "debug_condition","And round:"+i);
                     if (!Condition.checkAndCondition(conf, jsonData)){
                         System.out.println("return not match and");
                         LogFile.logMessageTest("KafkaConsumerService", "debug_condition","return not match and");
@@ -86,17 +88,21 @@ public class SmsConditionService {
             }
 
             if(smsCondition.getConditions_or()!= null){
+                Boolean isMatch = false;
                 // System.out.println("smsCondition.getConditions_or:"+smsCondition.getConditions_or());
                 JSONArray jsonSmsOrCon = new JSONArray(smsCondition.getConditions_or());
                 
                 for (int i = 0; i < jsonSmsOrCon.length(); i++) {
                     JSONObject conf = jsonSmsOrCon.getJSONObject(i);
+                    LogFile.logMessageTest("KafkaConsumerService", "debug_condition","Or round:"+i);
                     if (Condition.checkOrCondition(conf, jsonData)){
                         LogFile.logMessageTest("KafkaConsumerService", "debug_condition","return match or");
-                        return true;
+                        isMatch = true;
+                        break;
                     }
                     
                 }
+                return isMatch;
             }
 
             
