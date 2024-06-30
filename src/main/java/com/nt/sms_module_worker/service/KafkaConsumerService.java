@@ -64,7 +64,7 @@ public class KafkaConsumerService {
 
         // DEV
         topics = {"NEW","SUSPEND","RECONNECT","CHANGEPACKAGE","CHANGESIM","TOPUPRECHARGE","PACKAGEEXPIRE","BULKPREPROVISIONING","CHANGEMSISDN","CHANGEOWNER","CONTRACTMANAGEMENT","CREDITLIMIT","EXTENDEXPIRATIONDATE","NOTIFICATIONPACKAGESTATUSCHANGE","SWAPPOSTPAIDTOPREPAID","SWAPPREPAIDTOPOSTPAID","TERMINATE","VARIETYSERVICE"},
-        groupId = "sms_module.worker"
+        groupId = "SMS_MODULE.WORKER"
     )
     public void listening(@Payload String message, @Header(KafkaHeaders.RECEIVED_TOPIC) String topic) throws Exception {
         // System.out.println("Received message from topic " + topic);
