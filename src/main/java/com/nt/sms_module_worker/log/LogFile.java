@@ -16,15 +16,19 @@ import java.util.logging.Level;
 
 public class LogFile {
 
-	public static void logMessage(String className, String path, String phoneNumber,ConsentResp messageLog) {
+	public static String dateFolderName() {
+        Date date = new Date();
+        SimpleDateFormat df = new SimpleDateFormat("MMyyyy");
+        return df.format(date);
+    }
+
+	public static void logMessage(String className, String path, String phoneNumber, ConsentResp messageLog) {
         Logger logger = Logger.getLogger(className);
 
         try {
-            Date date = new Date();
-            SimpleDateFormat df = new SimpleDateFormat("MMyyyy");
             
             // Use JBoss data directory
-            String jbossDataDir = "data";
+            String jbossDataDir = "./data/logs/pdpa/";
             
             String pathLog = jbossDataDir + "/" + path + "/";
             // SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
@@ -38,7 +42,7 @@ public class LogFile {
                 }
             }
 
-            FileHandler fileHandler = new FileHandler(pathLog + "/" + fileName, 1024 * 1024, 5, true);
+            FileHandler fileHandler = new FileHandler(pathLog + "/" + fileName, true);
             fileHandler.setFormatter(new PlainTextFormatter());
             logger.addHandler(fileHandler);
             logger.setUseParentHandlers(false); // Prevents logging to console
