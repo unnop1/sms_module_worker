@@ -36,6 +36,10 @@ public class DataSmsMessage {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonProperty("requestDate")
     private LocalDateTime requestDate;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonProperty("deliveryDateTime")
+    private LocalDateTime deliveryDateTime;
     
     // message text
     @JsonProperty("message")

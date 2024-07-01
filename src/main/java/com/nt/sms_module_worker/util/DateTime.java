@@ -51,6 +51,25 @@ public class DateTime {
         return LocalDateTime.now();
     }
 
+    public static final LocalDateTime getDeliveryDateTimeFromStartTime(String input){
+        // String input = "00:50"; // input time as string
+        try{
+            // Parse the input time
+            DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
+            LocalTime time = LocalTime.parse(input, timeFormatter);
+
+            // Get the current date
+            LocalDate today = LocalDate.now();
+
+            // Combine date and time to create LocalDateTime
+            LocalDateTime dateTime = LocalDateTime.of(today, time);
+
+            return dateTime;
+        }catch(Exception e){
+            return null;
+        }
+    }
+
     public static LocalDateTime parseDateTime(String dateTimeStr) {
         try {
             return LocalDateTime.parse(dateTimeStr, DateTimeFormatter.ISO_DATE_TIME);

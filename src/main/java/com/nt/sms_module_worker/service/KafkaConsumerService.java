@@ -22,6 +22,7 @@ import com.nt.sms_module_worker.model.dao.pdpa.consent.ConsentResp;
 import java.sql.Clob;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import org.json.JSONObject;
@@ -155,8 +156,9 @@ public class KafkaConsumerService {
                     }
                     for (ConfigConditionsEntity condition : smsConditions) {
                         JSONObject jsonData = new JSONObject(messageMq);
+                        Boolean isDeliveryDateTime = false;
                         if(!pdpaService.mustInRangeTime(condition)){
-                                continue;
+                            isDeliveryDateTime = true;
                         }
 
                         if (smsConditionService.checkSendSms(condition, jsonData)){
@@ -221,16 +223,26 @@ public class KafkaConsumerService {
                             // Message to send sms message
                             SendSmsGatewayData sendSmsData = new SendSmsGatewayData();
                             List<DataSmsMessage> smsMessages = new ArrayList<>();
+                            if(!pdpaService.mustInRangeTime(condition)){
+                                continue;
+                            }
                             for (int i = 0; i < phoneNumberSendSms.size();i++){
                                 DataSmsMessage smsData = new DataSmsMessage();
+                                String smsTransID = String.format("RED-%s-%s", systemTransRef, DateTime.getTimeStampNow().toInstant().toEpochMilli());
                                 smsData.setMessage(smsMessage);
-                                smsData.setSystemTransRef(String.format("RED-%s-%s", systemTransRef, DateTime.getTimeStampNow().toInstant().toEpochMilli()));
+                                smsData.setSystemTransRef(smsTransID);
                                 smsData.setTarget(phoneNumberSendSms.get(i));
                                 smsData.setSource("my");
                                 smsData.setRequestDate(DateTime.getRequestDateUtcNow());
+                                if(isDeliveryDateTime){
+                                    LocalDateTime deliveryDateTime = DateTime.getDeliveryDateTimeFromStartTime(condition.getTime_Start());
+                                    if(deliveryDateTime != null){
+                                        smsData.setDeliveryDateTime(deliveryDateTime);
+                                    }
+                                }
                                 smsMessages.add(smsData);
                             }
-                            sendSmsData.setBulkRef("BulkTest-e9bfae24-82c5-11ee-b962-0242ac120002");
+                            sendSmsData.setBulkRef(systemTransRef);
                             sendSmsData.setMessages(smsMessages);
                             objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
                             String payloadGwStr = objectMapper.writeValueAsString(sendSmsData);

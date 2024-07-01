@@ -61,12 +61,12 @@ public class PDPAService {
             if (condition.getIs_period_time().equals(1)){
                 if (DateTime.isCurrentTimeInRange(condition.getTime_Start(), condition.getTime_End())){
                     return true;
+                }else{
+                    return false;
                 }
-            }else{
-                return true;
             }
         }
-        return false;
+        return true;
     }
 
     public ConsentResp getPDPAConsent(String phoneNumber) throws Exception{
