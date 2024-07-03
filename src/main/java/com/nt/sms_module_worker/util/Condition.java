@@ -82,19 +82,19 @@ public class Condition {
             try{
                 System.out.println("dataValue:" +dataValue );
                 System.out.println("orConfValue:" +orConfValue );
-                LogFile.logMessageTest("Condition", "debug_condition","dataValue:"+dataValue);
-                LogFile.logMessageTest("Condition", "debug_condition","operator:"+operator );
-                LogFile.logMessageTest("Condition", "debug_condition","orConfValue:"+orConfValue );
+                // LogFile.logMessageTest("Condition", "debug_condition","dataValue:"+dataValue);
+                // LogFile.logMessageTest("Condition", "debug_condition","operator:"+operator );
+                // LogFile.logMessageTest("Condition", "debug_condition","orConfValue:"+orConfValue );
                 LocalDateTime dataDateTime = DateTime.convertDateTime(dataValue);
                 LocalDateTime conditionDateTime = DateTime.convertDateTime(orConfValue);
 
-                LogFile.logMessageTest("Condition", "debug_condition","dataDateTime:"+dataDateTime.toString() );
-                LogFile.logMessageTest("Condition", "debug_condition","conditionDateTime:"+conditionDateTime.toString() );
-                LogFile.logMessageTest("Condition", "debug_condition","doDateTimeOperation:"+doDateTimeOperation(operator, dataDateTime, conditionDateTime));
+                // LogFile.logMessageTest("Condition", "debug_condition","dataDateTime:"+dataDateTime.toString() );
+                // LogFile.logMessageTest("Condition", "debug_condition","conditionDateTime:"+conditionDateTime.toString() );
+                // LogFile.logMessageTest("Condition", "debug_condition","doDateTimeOperation:"+doDateTimeOperation(operator, dataDateTime, conditionDateTime));
                 return doDateTimeOperation(operator, dataDateTime, conditionDateTime);
             }catch(Exception e){
                 System.out.println("error converting date time : " + e.getMessage());
-                LogFile.logMessageTest("Condition", "debug_condition","error converting date time : " + e.getMessage() );
+                // LogFile.logMessageTest("Condition", "debug_condition","error converting date time : " + e.getMessage() );
             }
         }
 
@@ -258,16 +258,16 @@ public class Condition {
 
     public static final boolean doArrayOperation(String operation_type, String conditionKey,JSONObject jsonData, JSONArray conditionArray) throws Exception{
         String dataType = Condition.checkFieldType(jsonData, conditionKey);
-        System.out.println("================================ doArrayOperation ===========================================");
-        System.out.println(" conditionKey : " + conditionKey);
-        System.out.println(" operation_type : " + operation_type);
-        System.out.println(" dataType: " + dataType);
-        System.out.println("=============================================================================================");
-        LogFile.logMessageTest("Condition", "debug_condition","================================doCondition================================");
-        LogFile.logMessageTest("Condition", "debug_condition","conditionKey:"+conditionKey);
-        LogFile.logMessageTest("Condition", "debug_condition","dataType:"+dataType);
-        LogFile.logMessageTest("Condition", "debug_condition","operation_type:"+operation_type);
-        System.out.println("===========================================================================");
+        // System.out.println("================================ doArrayOperation ===========================================");
+        // System.out.println(" conditionKey : " + conditionKey);
+        // System.out.println(" operation_type : " + operation_type);
+        // System.out.println(" dataType: " + dataType);
+        // System.out.println("=============================================================================================");
+        // LogFile.logMessageTest("Condition", "debug_condition","================================doCondition================================");
+        // LogFile.logMessageTest("Condition", "debug_condition","conditionKey:"+conditionKey);
+        // LogFile.logMessageTest("Condition", "debug_condition","dataType:"+dataType);
+        // LogFile.logMessageTest("Condition", "debug_condition","operation_type:"+operation_type);
+        // System.out.println("===========================================================================");
         Boolean found = false;
         
         switch (dataType) {
@@ -385,12 +385,12 @@ public class Condition {
         System.out.println("jsonData:"+jsonData.toString());
         String operation_type = orValueConfig.getString("operation_type").toLowerCase();
         System.out.println("operation_type:"+operation_type);
-        LogFile.logMessageTest("Condition", "debug_condition","================================doCondition================================");
-        LogFile.logMessageTest("Condition", "debug_condition","ValueConfig:"+orValueConfig.toString());
-        LogFile.logMessageTest("Condition", "debug_condition","checkFieldType:"+configValueType);
-        LogFile.logMessageTest("Condition", "debug_condition","jsonData:"+jsonData.toString());
-        LogFile.logMessageTest("Condition", "debug_condition","operation_type:"+operation_type);
-        System.out.println("===========================================================================");
+        // LogFile.logMessageTest("Condition", "debug_condition","================================doCondition================================");
+        // LogFile.logMessageTest("Condition", "debug_condition","ValueConfig:"+orValueConfig.toString());
+        // LogFile.logMessageTest("Condition", "debug_condition","checkFieldType:"+configValueType);
+        // LogFile.logMessageTest("Condition", "debug_condition","jsonData:"+jsonData.toString());
+        // LogFile.logMessageTest("Condition", "debug_condition","operation_type:"+operation_type);
+        // System.out.println("===========================================================================");
         switch (configValueType) {
             case "Integer":
                 Integer dataInt = jsonData.getInt(conditionKey);
