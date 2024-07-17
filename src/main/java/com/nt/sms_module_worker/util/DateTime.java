@@ -51,21 +51,33 @@ public class DateTime {
         return LocalDateTime.now();
     }
 
-    public static final LocalDateTime getDeliveryDateTimeFromStartTime(String input){
-        // String input = "00:50"; // input time as string
-        try{
-            // Parse the input time
+    public static final LocalDateTime getDeliveryDateTimeFromStartTime(String startInput, String endInput){
+        try {
+            // Parse the input start and end times
             DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
-            LocalTime time = LocalTime.parse(input, timeFormatter);
+            LocalTime startTime = LocalTime.parse(startInput, timeFormatter);
+            LocalTime endTime = LocalTime.parse(endInput, timeFormatter);
 
-            // Get the current date
+            // Get the current time and date
+            LocalTime now = LocalTime.now();
             LocalDate today = LocalDate.now();
+            
+            // Determine the delivery date and time
+            LocalDateTime deliveryDateTime;
+            if (now.isBefore(startTime)) {
+                // Current time is before start time, delivery is today at start time
+                deliveryDateTime = LocalDateTime.of(today, startTime);
+            } else if (now.isAfter(endTime)) {
+                // Current time is after end time, delivery is tomorrow at start time
+                deliveryDateTime = LocalDateTime.of(today.plusDays(1), startTime);
+            } else {
+                // Current time is within the range, delivery is today at start time
+                deliveryDateTime = LocalDateTime.of(today, startTime);
+            }
 
-            // Combine date and time to create LocalDateTime
-            LocalDateTime dateTime = LocalDateTime.of(today, time);
-
-            return dateTime;
-        }catch(Exception e){
+            return deliveryDateTime;
+        } catch (Exception e) {
+            e.printStackTrace();
             return null;
         }
     }

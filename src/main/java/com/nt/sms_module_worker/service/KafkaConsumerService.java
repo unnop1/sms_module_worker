@@ -156,20 +156,19 @@ public class KafkaConsumerService {
                     }
                     for (ConfigConditionsEntity condition : smsConditions) {
                         JSONObject jsonData = new JSONObject(messageMq);
-                        Boolean isDeliveryDateTime = false;
-                        if(!pdpaService.mustInRangeTime(condition)){
-                            isDeliveryDateTime = true;
-                        }
-
                         if (smsConditionService.checkSendSms(condition, jsonData)){
                         // if(true){
                             // Check PDPA
                             isMatchCondition = true;
+                            Boolean isDeliveryDateTime = false;
                             String conditionMessage = condition.getMessage();
                             String smsMessage = MapString.mapPatternToSmsMessage(conditionMessage, jsonData);
                             SmsGatewayEntity smsMatchConditionGw = new SmsGatewayEntity();
                             Timestamp createdDate = DateTime.getTimeStampNow();
                             String systemTransRef = receivedData.getOrderID();
+                            if(!pdpaService.mustInRangeTime(condition)){
+                                isDeliveryDateTime = true;
+                            }
                             
                             if (!isCheckedPDPA){
                                 Boolean mustCheckPDPA = pdpaService.mustCheckPDPA(condition);
@@ -223,9 +222,6 @@ public class KafkaConsumerService {
                             // Message to send sms message
                             SendSmsGatewayData sendSmsData = new SendSmsGatewayData();
                             List<DataSmsMessage> smsMessages = new ArrayList<>();
-                            if(!pdpaService.mustInRangeTime(condition)){
-                                continue;
-                            }
                             for (int i = 0; i < phoneNumberSendSms.size();i++){
                                 DataSmsMessage smsData = new DataSmsMessage();
                                 String smsTransID = String.format("RED-%s-%s", systemTransRef, DateTime.getTimeStampNow().toInstant().toEpochMilli());
@@ -234,8 +230,10 @@ public class KafkaConsumerService {
                                 smsData.setTarget(phoneNumberSendSms.get(i));
                                 smsData.setSource("my");
                                 smsData.setRequestDate(DateTime.getRequestDateUtcNow());
+                                // System.out.println("isDeliveryDateTime:"+isDeliveryDateTime);
                                 if(isDeliveryDateTime){
-                                    LocalDateTime deliveryDateTime = DateTime.getDeliveryDateTimeFromStartTime(condition.getTime_Start());
+                                    LocalDateTime deliveryDateTime = DateTime.getDeliveryDateTimeFromStartTime(condition.getTime_Start(), condition.getTime_End());
+                                    // System.out.println("deliveryDateTime:"+deliveryDateTime.toString());
                                     if(deliveryDateTime != null){
                                         smsData.setDeliveryDateTime(deliveryDateTime);
                                     }
@@ -252,7 +250,7 @@ public class KafkaConsumerService {
                             smsMatchConditionGw.setPayloadGW(payloadGwClob);
                             
                             SmsGatewayEntity smsMatchConditionLogGw = smsGatewayService.createConditionalMessage(smsMatchConditionGw);
-                            
+                            System.out.println("smsMatchConditionLogGw:"+smsMatchConditionLogGw.toString());
 
                             if(!isSkipSendSms){
                                 for (int sendSmsCount = 1; sendSmsCount <= MaxRetrySendSmsCount ; sendSmsCount++) {

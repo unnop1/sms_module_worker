@@ -59,7 +59,7 @@ public class PDPAService {
     public boolean mustInRangeTime(ConfigConditionsEntity condition){
         if (condition.getIs_period_time()!= null){
             if (condition.getIs_period_time().equals(1)){
-                System.out.println("check range time:"+DateTime.isCurrentTimeInRange(condition.getTime_Start(), condition.getTime_End()));
+                // System.out.println("check range time:"+DateTime.isCurrentTimeInRange(condition.getTime_Start(), condition.getTime_End()));
                 return DateTime.isCurrentTimeInRange(condition.getTime_Start(), condition.getTime_End());
             }
         }
