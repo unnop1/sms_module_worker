@@ -7,8 +7,6 @@ import java.time.LocalDateTime;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import com.nt.sms_module_worker.log.LogFile;
-
 public class Condition {
 
     public static final String checkFieldType(JSONObject jObj, String fieldName) {
@@ -80,21 +78,11 @@ public class Condition {
         // Date String operations
         if(isDateFormatData(orConfValue)){
             try{
-                System.out.println("dataValue:" +dataValue );
-                System.out.println("orConfValue:" +orConfValue );
-                // LogFile.logMessageTest("Condition", "debug_condition","dataValue:"+dataValue);
-                // LogFile.logMessageTest("Condition", "debug_condition","operator:"+operator );
-                // LogFile.logMessageTest("Condition", "debug_condition","orConfValue:"+orConfValue );
                 LocalDateTime dataDateTime = DateTime.convertDateTime(dataValue);
                 LocalDateTime conditionDateTime = DateTime.convertDateTime(orConfValue);
 
-                // LogFile.logMessageTest("Condition", "debug_condition","dataDateTime:"+dataDateTime.toString() );
-                // LogFile.logMessageTest("Condition", "debug_condition","conditionDateTime:"+conditionDateTime.toString() );
-                // LogFile.logMessageTest("Condition", "debug_condition","doDateTimeOperation:"+doDateTimeOperation(operator, dataDateTime, conditionDateTime));
                 return doDateTimeOperation(operator, dataDateTime, conditionDateTime);
             }catch(Exception e){
-                System.out.println("error converting date time : " + e.getMessage());
-                // LogFile.logMessageTest("Condition", "debug_condition","error converting date time : " + e.getMessage() );
             }
         }
 
@@ -208,7 +196,6 @@ public class Condition {
     }
 
     public static final boolean doNumberOperation(String operator,Integer dataNumber, Integer orConfNumber){
-        System.out.println(operator+" , dataNumber: "+dataNumber+ " , orConfNumber:"+ orConfNumber);
         switch (operator) {
             case "!=":
                 return !dataNumber.equals(orConfNumber);
@@ -229,14 +216,11 @@ public class Condition {
 
     public static final String checkTypeObject(Object obj, String fieldName){
         if (obj instanceof JSONObject) {
-            System.out.println("checkTypeObject json data:"+obj.toString());
-            System.out.println("checkTypeObject fieldName:"+fieldName);
             JSONObject checkJsonObj = new JSONObject(obj.toString());
             JSONObject checkJsonKey = checkJsonObj.optJSONObject(fieldName);
             if (checkJsonKey != null){
                 JSONObject jsonObj = checkJsonObj.getJSONObject(fieldName);
                 Integer jsonSize = jsonObj.length();
-                System.out.println("jsonSize:"+jsonSize);
                 
                 if (jsonSize == 2){
                     if (jsonObj.has("value") && jsonObj.has("operation_type")){
@@ -258,16 +242,6 @@ public class Condition {
 
     public static final boolean doArrayOperation(String operation_type, String conditionKey,JSONObject jsonData, JSONArray conditionArray) throws Exception{
         String dataType = Condition.checkFieldType(jsonData, conditionKey);
-        // System.out.println("================================ doArrayOperation ===========================================");
-        // System.out.println(" conditionKey : " + conditionKey);
-        // System.out.println(" operation_type : " + operation_type);
-        // System.out.println(" dataType: " + dataType);
-        // System.out.println("=============================================================================================");
-        // LogFile.logMessageTest("Condition", "debug_condition","================================doCondition================================");
-        // LogFile.logMessageTest("Condition", "debug_condition","conditionKey:"+conditionKey);
-        // LogFile.logMessageTest("Condition", "debug_condition","dataType:"+dataType);
-        // LogFile.logMessageTest("Condition", "debug_condition","operation_type:"+operation_type);
-        // System.out.println("===========================================================================");
         Boolean found = false;
         
         switch (dataType) {
@@ -278,8 +252,6 @@ public class Condition {
                         for (int i = 0; i < conditionArray.length(); i++) {
                             Object conditionObject = conditionArray.get(i);
                             String elementType = checkTypeObject(conditionObject, conditionKey);
-                            // System.out.println("conditionKey: "+conditionKey+" ,  elementType : " + elementType);
-                            LogFile.logMessageTest("Condition", "debug_condition","conditionKey: "+conditionKey+" ,  elementType : " + elementType);
                             switch ( elementType ) {
                                 case "String":
                                     String conditionStr = conditionArray.getString(i);
@@ -289,7 +261,6 @@ public class Condition {
                                     break;
                                 case "ValueConfig":
                                     JSONObject subCondition = conditionArray.getJSONObject(i);
-                                    // System.out.println("==> subCondition : " + subCondition);
                                     boolean isMatchCondition = checkAndCondition(subCondition, jsonData);
                                     if (isMatchCondition){
                                         found = true;
@@ -305,13 +276,9 @@ public class Condition {
                         }
                         break;
                     case "between":
-                        // Date Between
-                        // System.out.println("dataStr:"+dataStr);
                         LocalDateTime dataTimestamp = DateTime.convertDateTime(dataStr);
                         String startTimeStr = conditionArray.getString(0);
                         String endTimeStr = conditionArray.getString(1);
-                        // System.out.println("startTimeStr:"+startTimeStr);
-                        // System.out.println("endTimeStr:"+endTimeStr);
                         LocalDateTime startTime = DateTime.convertDateTime(startTimeStr);
                         LocalDateTime endTime = DateTime.convertDateTime(endTimeStr, false);
 
@@ -332,7 +299,6 @@ public class Condition {
                     for (int i = 0; i < conditionArray.length(); i++) {
                         Object conditionObject = conditionArray.get(i);
                         String elementType = checkTypeObject(conditionObject, conditionKey);
-                        System.out.println("conditionKey: "+conditionKey+" ,  elementType : " + elementType);
                         switch ( elementType ) {
                             case "Integer":
                                 Integer conditionStr = conditionArray.getInt(i);
@@ -342,7 +308,6 @@ public class Condition {
                                 break;
                             case "ValueConfig":
                                 JSONObject subCondition = conditionArray.getJSONObject(i);
-                                System.out.println("==> subCondition : " + subCondition);
                                 if (checkAndCondition(subCondition, jsonData)){
                                     found = true;
                                 }
@@ -379,18 +344,7 @@ public class Condition {
     public static final Boolean doCondition(JSONObject jsonData, String conditionKey, JSONObject orValueConfig) throws Exception{
         // check condition
         String configValueType = Condition.checkFieldType(orValueConfig, "value");
-        System.out.println("================================doCondition================================");
-        System.out.println("ValueConfig:"+orValueConfig.toString());
-        System.out.println("checkFieldType:"+configValueType);
-        System.out.println("jsonData:"+jsonData.toString());
         String operation_type = orValueConfig.getString("operation_type").toLowerCase();
-        System.out.println("operation_type:"+operation_type);
-        // LogFile.logMessageTest("Condition", "debug_condition","================================doCondition================================");
-        // LogFile.logMessageTest("Condition", "debug_condition","ValueConfig:"+orValueConfig.toString());
-        // LogFile.logMessageTest("Condition", "debug_condition","checkFieldType:"+configValueType);
-        // LogFile.logMessageTest("Condition", "debug_condition","jsonData:"+jsonData.toString());
-        // LogFile.logMessageTest("Condition", "debug_condition","operation_type:"+operation_type);
-        // System.out.println("===========================================================================");
         switch (configValueType) {
             case "Integer":
                 Integer dataInt = jsonData.getInt(conditionKey);
@@ -404,10 +358,6 @@ public class Condition {
                 String dataStr = jsonData.getString(conditionKey);
                 String conditionStr = orValueConfig.getString("value");
                 return Condition.doStringOperation(operation_type, dataStr, conditionStr);
-            case "BigDecimal":
-                BigDecimal dataBigDecimal = jsonData.getBigDecimal(conditionKey);
-                BigDecimal conditionBigDecimal = orValueConfig.getBigDecimal("value");
-                return Condition.doBigDecimalOperation(operation_type, dataBigDecimal, conditionBigDecimal);
             case "Float":
                 Float dataFloat = jsonData.getFloat(conditionKey);
                 Float conditionFloat = orValueConfig.getFloat("value");
@@ -432,10 +382,7 @@ public class Condition {
         if(jsonArray.length() > 0){
             for (int i = 0; i < jsonArray.length(); i++){
                 JSONObject dataJson = jsonArray.getJSONObject(i); // first element only
-                // System.out.println("next array data==> "+dataJson.toString());
                 JSONObject orConditionFound = orConf.optJSONObject(conditionKey);
-                // System.out.println("next orConditionFound data==> "+orConditionFound.toString());
-                LogFile.logMessageTest("Condition", "debug_condition","next orConditionFound data==> "+orConditionFound.toString());
                 if(orConditionFound == null || dataJson == null){
                     continue;
                 }
@@ -448,22 +395,13 @@ public class Condition {
                 JSONArray values = valueConfig.getJSONArray("value");
                 for (int j = 0; j < values.length(); j++){
                     JSONObject subCondition = values.getJSONObject(j);
-                    // System.out.println("next array data==> "+dataJson.toString());
-                    System.out.println(" conditionKey==> "+conditionKey);
-                    LogFile.logMessageTest("Condition", "debug_condition"," conditionKey==> "+conditionKey);
-                    System.out.println("next subCondition==> "+subCondition.toString() );
-                    LogFile.logMessageTest("Condition", "debug_condition","next subCondition==> "+subCondition.toString() );
                     if (!isMatchAllData){
                         isMatchArrayCondition = checkAndCondition(subCondition, dataJson);
-                        System.out.println("isMatchArrayConditionOR==> "+isMatchArrayCondition);
-                        LogFile.logMessageTest("Condition", "debug_condition","isMatchArrayCondition==> "+isMatchArrayCondition);
                         if (isMatchArrayCondition){
                             return true;
                         }
                     }else{
                         isMatchArrayCondition = checkOrCondition(subCondition, dataJson);
-                        System.out.println("isMatchArrayConditionAND==> "+isMatchArrayCondition);
-                        LogFile.logMessageTest("Condition", "debug_condition","isMatchArrayCondition==> "+isMatchArrayCondition);
                         if (!isMatchArrayCondition){
                             return false;
                         }
@@ -483,11 +421,7 @@ public class Condition {
         if(jsonArray.length() > 0){
             for (int i = 0; i < jsonArray.length(); i++){
                 JSONObject dataJson = jsonArray.getJSONObject(i); // first element only
-                System.out.println("next array data==> "+dataJson.toString());
-                LogFile.logMessageTest("KafkaConsumerService", "debug_condition","next array data==> "+dataJson.toString());
                 JSONObject andConditionFound = andConf.optJSONObject(conditionKey);
-                System.out.println("next andConditionFound data==> "+andConditionFound.toString());
-                LogFile.logMessageTest("KafkaConsumerService", "debug_condition","next andConditionFound data==> "+andConditionFound.toString());
                 if(andConditionFound == null || dataJson == null){
                     continue;
                 }
@@ -500,22 +434,13 @@ public class Condition {
                 JSONArray values = valueConfig.getJSONArray("value");
                 for (int j = 0; j < values.length(); j++){
                     JSONObject subCondition = values.getJSONObject(j);
-                    // System.out.println("next array data==> "+dataJson.toString());
-                    System.out.println(" conditionKey==> "+conditionKey);
-                    LogFile.logMessageTest("KafkaConsumerService", "debug_condition"," conditionKey==> "+conditionKey);
-                    System.out.println("next subCondition==> "+subCondition.toString() );
-                    LogFile.logMessageTest("KafkaConsumerService", "debug_condition","next subCondition==> "+subCondition.toString()  );
                     if (!isMatchAllData){
                         isMatchArrayCondition = checkAndCondition(subCondition, dataJson);
-                        System.out.println("isMatchArrayCondition==> "+isMatchArrayCondition);
-                        LogFile.logMessageTest("KafkaConsumerService", "debug_condition","isMatchArrayCondition==> "+isMatchArrayCondition );
                         if (isMatchArrayCondition){
                             return true;
                         }
                     }else{
                         isMatchArrayCondition = checkOrCondition(subCondition, dataJson);
-                        System.out.println("isMatchArrayCondition==> "+isMatchArrayCondition);
-                        LogFile.logMessageTest("KafkaConsumerService", "debug_condition","isMatchArrayCondition==> "+isMatchArrayCondition);
                         if (!isMatchArrayCondition){
                             return false;
                         }
@@ -534,37 +459,24 @@ public class Condition {
         for (String conditionKey : orConf.keySet()){
             String orConfType = Condition.checkFieldType(orConf, conditionKey);
             String dataType = Condition.checkFieldType(jsonData, conditionKey);
-            System.out.println(conditionKey+ " have orconf type "+ orConfType +" and data type "+ dataType);
-            LogFile.logMessageTest("KafkaConsumerService", "debug_condition",conditionKey+ " have orconf type "+ orConfType +" and data type "+ dataType);
             if (dataType == "NotFound"){
-                LogFile.logMessageTest("KafkaConsumerService", "debug_condition","data NotFound");
                 return true;
             }else if(orConfType == "ValueConfig"){
-                // String dataValue = jsonData.getString(key);
-                
-                // String operation_type = orConfValue.getString("operation_type");
                 if (dataType == "JSONArray"){
                     boolean isMatchArrayCondition = checkOrConditionValueConfigArray(conditionKey, jsonData, orConf);
                     if (isMatchArrayCondition){
-                        LogFile.logMessageTest("KafkaConsumerService", "debug_condition","isMatchArrayCondition:"+ isMatchArrayCondition);
                         return true;
                     }
                 }else{
                     JSONObject orValueConfig = orConf.getJSONObject(conditionKey);
                     isMatchCondition = doCondition(jsonData, conditionKey, orValueConfig);
                 }
-                System.out.println(conditionKey+ " have orconf type "+ orConfType +" and data type "+ dataType + " isMatchCondition :"+ isMatchCondition );
-                LogFile.logMessageTest("KafkaConsumerService", "debug_condition",conditionKey+ " have orconf type "+ orConfType +" and data type "+ dataType + " isMatchCondition :"+ isMatchCondition);
                 if (isMatchCondition){
-                    LogFile.logMessageTest("KafkaConsumerService", "debug_condition","isMatchCondition:"+ isMatchCondition);
                     return true;
                 }
             }else{
                 // Sub Object
                 if (dataType == "JSONArray"){
-                    System.out.println("OR Condition array");
-                    LogFile.logMessageTest("KafkaConsumerService", "debug_condition","OR Condition array");
-                
                     boolean isMatchArrayCondition = checkOrConditionValueConfigArray(conditionKey, jsonData, orConf);
                     if (isMatchArrayCondition){
                         return true;
@@ -572,7 +484,6 @@ public class Condition {
                 }else{
                     isMatchCondition = checkOrCondition(orConf.getJSONObject(conditionKey), jsonData.getJSONObject(conditionKey));
                     if (isMatchCondition){
-                        LogFile.logMessageTest("KafkaConsumerService", "debug_condition","isMatchCondition:"+ isMatchCondition);
                         return true;
                     }
                 }
@@ -589,8 +500,6 @@ public class Condition {
         for (String conditionKey : andConf.keySet()){
             String andConfType = Condition.checkFieldType(andConf, conditionKey);
             String dataType = Condition.checkFieldType(jsonData, conditionKey);
-            System.out.println("root==> "+conditionKey+ " have conf type "+ andConfType +" and data type "+ dataType);
-            System.out.println("jsonData:"+jsonData.toString());
             if (dataType == "NotFound"){
                 return false;
             }else if(andConfType == "ValueConfig"){
@@ -600,11 +509,8 @@ public class Condition {
                         return false;
                     }
                 }else{
-                    // String dataValue = jsonData.getString(key);
                     JSONObject orValueConfig = andConf.getJSONObject(conditionKey);
-                    // String operation_type = orConfValue.getString("operation_type");
                     isMatchCondition = doCondition( jsonData, conditionKey, orValueConfig);
-                    System.out.println(conditionKey+ " have andconf type "+ andConfType +" and data type "+ dataType + " isMatchCondition :"+ isMatchCondition);
                 }
 
                 if (!isMatchCondition){

@@ -73,7 +73,6 @@ public class KafkaConsumerService {
         try {
             
             // Process the message based on the queue name
-            // System.out.println("isSkipPDPA:"+ pdpaService.getIsSkipPDPA());
             processOrderType(message);
         }catch (SQLException sqle) {
             Timestamp receiveDate = DateTime.getTimeStampNow();
@@ -116,7 +115,6 @@ public class KafkaConsumerService {
         Clob messageMqClob = new javax.sql.rowset.serial.SerialClob(messageMq.toCharArray());
 
         OrderTypeEntity orderTypeData = orderTypeService.getOrderType(receivedData.getOrderType().toUpperCase());
-        // System.out.println("orderTypeData: " + orderTypeData.getOrderTypeName() );
         if (orderTypeData == null){
             Timestamp createdDate = DateTime.getTimeStampNow();        
             SmsGatewayEntity smsMisMatchConditionGw = new SmsGatewayEntity();
@@ -131,12 +129,8 @@ public class KafkaConsumerService {
             smsGatewayService.createConditionalMessage(smsMisMatchConditionGw);
         }else{
             Integer isEnableOrderType = orderTypeData.getIsEnable();
-            // System.out.println("isEnableOrderType: " + isEnableOrderType );
             if (isEnableOrderType.equals(1)){
-                // System.out.println("smsEnableConditionGw remark" );
-                // String querySmsCondition = smsConditionService.getQueryOrderTypeSmsCondition(receivedData);
                 List<ConfigConditionsEntity> smsConditions = smsConditionService.getListSmsCondition(receivedData.getOrderType());
-                // System.out.println("smsConditions size: " + smsConditions.size() );
                 
                 if (smsConditions.size() > 0) {    
                     // send sms
@@ -177,7 +171,6 @@ public class KafkaConsumerService {
                                     consentPDPA = pdpaService.getPDPAConsent(receivedData.getMsisdn());
                                     LogFile.logMessage("KafkaConsumerService", String.format("%s/pdpa_consent",LogFile.dateFolderName()), receivedData.getMsisdn(),consentPDPA);
                                 }
-                                // LogFile.logMessageTest("KafkaConsumerService", "pdpa_consent_test", "isCheckedPDPA:"+isCheckedPDPA);
                             }
                             
                             if(consentPDPA != null){
@@ -216,7 +209,6 @@ public class KafkaConsumerService {
                             smsMatchConditionGw.setTransaction_id(receivedData.getOrderID());
                             smsMatchConditionGw.setCreated_Date(createdDate);
                             
-                            // System.out.println("smsMessage: " + smsMessage + " to phone " + receivedData.getMsisdn() );
                             
                             
                             // Message to send sms message
@@ -250,7 +242,6 @@ public class KafkaConsumerService {
                             smsMatchConditionGw.setPayloadGW(payloadGwClob);
                             
                             SmsGatewayEntity smsMatchConditionLogGw = smsGatewayService.createConditionalMessage(smsMatchConditionGw);
-                            System.out.println("smsMatchConditionLogGw:"+smsMatchConditionLogGw.toString());
 
                             if(!isSkipSendSms){
                                 for (int sendSmsCount = 1; sendSmsCount <= MaxRetrySendSmsCount ; sendSmsCount++) {
@@ -275,7 +266,6 @@ public class KafkaConsumerService {
                                         updateInfo.setIs_Status(5);
                                         updateInfo.setRemark("Error: " + e.getMessage());
                                         smsGatewayService.updateConditionalMessageById(smsMatchConditionLogGw.getGID()+1, updateInfo);
-                                        System.out.println("Error round "+sendSmsCount+" publishing: " + e.getMessage());
                                         return;
                                     }
                                 }
@@ -331,7 +321,6 @@ public class KafkaConsumerService {
                 smsNotEnableConditionGw.setCreated_Date(createdDate);
                 smsNotEnableConditionGw.setRemark("OrderType "+orderTypeData.getOrderTypeName()+" ถูกปิด");
                 smsGatewayService.createConditionalMessage(smsNotEnableConditionGw);
-                // System.out.println("smsNotEnableConditionGw remark: " + smsNotEnableConditionGw.getRemark() );
             }
         
         }

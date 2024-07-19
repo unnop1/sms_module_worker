@@ -28,7 +28,7 @@ public class LogFile {
         try {
             
             // Use JBoss data directory
-            String jbossDataDir = "./data/logs/pdpa/";
+            String jbossDataDir = "/data/logs/pdpa/";
             
             String pathLog = jbossDataDir + "/" + path + "/";
             // SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
