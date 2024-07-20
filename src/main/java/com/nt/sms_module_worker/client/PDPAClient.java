@@ -51,14 +51,11 @@ public class PDPAClient {
                 ObjectMapper objectMapper = new ObjectMapper();
                 String responseStr = response.toString();
 
-                LogFile.logMessageTest("KafkaConsumerService", "debug_pdpa", responseStr);
                 if (!responseStr.isBlank()) {
                     respData = objectMapper.readValue(responseStr, RefreshTokenResp.class);
                 }
             }
         } else {
-            // Handle non-OK response code
-            LogFile.logMessageTest("KafkaConsumerService", "error_pdpa", "HTTP error code: " + responseCode);
         }
 
         connection.disconnect();
@@ -103,11 +100,9 @@ public class PDPAClient {
                 }
             } else {
                 // Handle non-OK response code
-                LogFile.logMessageTest("ConsentService", "error_pdpa", "HTTP error code: " + responseCode);
             }
         } catch (Exception e) {
             e.printStackTrace();
-            LogFile.logMessageTest("ConsentService", "error_pdpa", "Exception: " + e.getMessage());
         } finally {
             if (connection != null) {
                 connection.disconnect();

@@ -77,11 +77,8 @@ public class SmsConditionService {
                 
                 for (int i = 0; i < jsonSmsAndCon.length(); i++) {
                     JSONObject conf = jsonSmsAndCon.getJSONObject(i);
-                    System.out.println("And round:"+i);
-                    LogFile.logMessageTest("KafkaConsumerService", "debug_condition","And round:"+i);
                     if (!Condition.checkAndCondition(conf, jsonData)){
                         System.out.println("return not match and");
-                        LogFile.logMessageTest("KafkaConsumerService", "debug_condition","return not match and");
                         return false;
                     }
                 }
@@ -94,9 +91,7 @@ public class SmsConditionService {
                 
                 for (int i = 0; i < jsonSmsOrCon.length(); i++) {
                     JSONObject conf = jsonSmsOrCon.getJSONObject(i);
-                    LogFile.logMessageTest("KafkaConsumerService", "debug_condition","Or round:"+i);
                     if (Condition.checkOrCondition(conf, jsonData)){
-                        LogFile.logMessageTest("KafkaConsumerService", "debug_condition","return match or");
                         isMatch = true;
                         break;
                     }

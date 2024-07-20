@@ -110,7 +110,6 @@ public class DateTime {
     public static final LocalDateTime convertDateTime(String input, boolean isBeginOfDay) throws Exception {
         String dateFormat = "yyyy-MM-dd";
         boolean isSimpleFormat = validateDate(input, dateFormat);
-        LogFile.logMessageTest("Condition", "debug_condition","isSimpleFormat:"+isSimpleFormat);
         if (isSimpleFormat) {
             LocalDate date = LocalDate.parse(input);
             
@@ -122,10 +121,8 @@ public class DateTime {
                 return dateTime;
             }
         } else if (isIsoDateTime(input)) {
-            LogFile.logMessageTest("Condition", "debug_condition","isIsoDateTime:"+isIsoDateTime(input));
             return LocalDateTime.parse(input, DateTimeFormatter.ISO_DATE_TIME);
         } else {
-            LogFile.logMessageTest("Condition", "debug_condition","Input string does not match expected formats");
             throw new DateTimeParseException("Input string does not match expected formats", input, 0);
         }
     }
