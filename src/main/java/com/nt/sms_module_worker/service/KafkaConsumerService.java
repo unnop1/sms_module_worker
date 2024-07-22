@@ -118,15 +118,17 @@ public class KafkaConsumerService {
         if (orderTypeData == null){
             Timestamp createdDate = DateTime.getTimeStampNow();        
             SmsGatewayEntity smsMisMatchConditionGw = new SmsGatewayEntity();
+            String remark = "ไม่พบ OrderType "+receivedData.getOrderType();
             smsMisMatchConditionGw.setPhoneNumber(receivedData.getMsisdn());
             smsMisMatchConditionGw.setOrderType(receivedData.getOrderType().toUpperCase());
             smsMisMatchConditionGw.setIs_Status(2);
             smsMisMatchConditionGw.setPayloadMQ(messageMqClob);
             smsMisMatchConditionGw.setReceive_Date(receiveDate);
             smsMisMatchConditionGw.setTransaction_id(receivedData.getOrderID());
-            smsMisMatchConditionGw.setRemark("ไม่พบ OrderType "+receivedData.getOrderType());
+            smsMisMatchConditionGw.setRemark(remark);
             smsMisMatchConditionGw.setCreated_Date(createdDate);
             smsGatewayService.createConditionalMessage(smsMisMatchConditionGw);
+            LogFile.logMessage("KafkaConsumerService", String.format("message/%s/unmapping/%s",LogFile.dateFolderName(), receivedData.getOrderType()), receivedData.getOrderID(), messageMq);
         }else{
             Integer isEnableOrderType = orderTypeData.getIsEnable();
             if (isEnableOrderType.equals(1)){
@@ -169,7 +171,7 @@ public class KafkaConsumerService {
                                 isCheckedPDPA = true;
                                 if (mustCheckPDPA){
                                     consentPDPA = pdpaService.getPDPAConsent(receivedData.getMsisdn());
-                                    LogFile.logMessage("KafkaConsumerService", String.format("%s/pdpa_consent",LogFile.dateFolderName()), receivedData.getMsisdn(),consentPDPA);
+                                    LogFile.logPdpaMessage("KafkaConsumerService", String.format("%s/pdpa_consent",LogFile.dateFolderName()), receivedData.getMsisdn(),consentPDPA);
                                 }
                             }
                             
@@ -192,6 +194,7 @@ public class KafkaConsumerService {
                                     smsNotEnableConditionGw.setConsentPDPA(pdpaJsonStr);
                                     smsNotEnableConditionGw.setRemark("ไม่ยอมรับ pdpa กับ orderType : "+orderTypeData.getOrderTypeName());
                                     smsGatewayService.createConditionalMessage(smsNotEnableConditionGw);
+                                    LogFile.logMessage("KafkaConsumerService", String.format("message/%s/pdpa/%s",LogFile.dateFolderName(), receivedData.getOrderType()), null, messageMq);
                                     return;
                                 }
                             }
@@ -208,6 +211,7 @@ public class KafkaConsumerService {
                             smsMatchConditionGw.setReceive_Date(receiveDate);
                             smsMatchConditionGw.setTransaction_id(receivedData.getOrderID());
                             smsMatchConditionGw.setCreated_Date(createdDate);
+                            LogFile.logMessage("KafkaConsumerService", String.format("message/%s/mapping/%s",LogFile.dateFolderName(), receivedData.getOrderType()), receivedData.getOrderID()+condition.getConditionsID(), messageMq);
                             
                             
                             
@@ -254,12 +258,14 @@ public class KafkaConsumerService {
                                         updateInfo.setSend_Date(sendDate);
                                         // System.out.println("smsMatchConditionGw.getGID: " + smsMatchConditionGw.getGID() );
                                         smsGatewayService.updateConditionalMessageById(smsMatchConditionLogGw.getGID()+1, updateInfo);
+                                        LogFile.logMessage("KafkaConsumerService", String.format("gateway/%s/success/%s",LogFile.dateFolderName(), receivedData.getOrderType()), null, messageMq);
                                         break;
                                     }catch (Exception e){
                                         if (sendSmsCount >= MaxRetrySendSmsCount){
                                             SmsGatewayEntity updateInfo = new SmsGatewayEntity();
                                             updateInfo.setIs_Status(3);
                                             smsGatewayService.updateConditionalMessageById(smsMatchConditionLogGw.getGID()+1, updateInfo);
+                                            LogFile.logMessage("KafkaConsumerService", String.format("gateway/%s/failed/%s",LogFile.dateFolderName(), receivedData.getOrderType()), null, messageMq);
                                             return;
                                         }
                                         SmsGatewayEntity updateInfo = new SmsGatewayEntity();
@@ -294,6 +300,7 @@ public class KafkaConsumerService {
                         smsMisMatchConditionGw.setReceive_Date(receiveDate);
                         smsMisMatchConditionGw.setCreated_Date(createdDate);
                         smsGatewayService.createConditionalMessage(smsMisMatchConditionGw);
+                        LogFile.logMessage("KafkaConsumerService", String.format("message/%s/unmapping/%s",LogFile.dateFolderName(), receivedData.getOrderType()), receivedData.getOrderID(), messageMq);
                     }
                 }else{
                     Timestamp createdDate = DateTime.getTimeStampNow(); 
@@ -308,10 +315,12 @@ public class KafkaConsumerService {
                     smsMisMatchConditionGw.setReceive_Date(receiveDate);
                     smsMisMatchConditionGw.setCreated_Date(createdDate);
                     smsGatewayService.createConditionalMessage(smsMisMatchConditionGw);
+                    LogFile.logMessage("KafkaConsumerService", String.format("message/%s/unmapping/%s",LogFile.dateFolderName(), receivedData.getOrderType()), receivedData.getOrderID(), messageMq);
                 }
             }else{
                 Timestamp createdDate = DateTime.getTimeStampNow(); 
                 SmsGatewayEntity smsNotEnableConditionGw = new SmsGatewayEntity();
+                String remark = "OrderType "+orderTypeData.getOrderTypeName()+" ถูกปิด";
                 smsNotEnableConditionGw.setPhoneNumber(receivedData.getMsisdn());
                 smsNotEnableConditionGw.setOrderType(receivedData.getOrderType().toUpperCase());
                 smsNotEnableConditionGw.setIs_Status(2);
@@ -319,8 +328,9 @@ public class KafkaConsumerService {
                 smsNotEnableConditionGw.setPayloadMQ(messageMqClob);
                 smsNotEnableConditionGw.setReceive_Date(receiveDate);
                 smsNotEnableConditionGw.setCreated_Date(createdDate);
-                smsNotEnableConditionGw.setRemark("OrderType "+orderTypeData.getOrderTypeName()+" ถูกปิด");
+                smsNotEnableConditionGw.setRemark(remark);
                 smsGatewayService.createConditionalMessage(smsNotEnableConditionGw);
+                LogFile.logMessage("KafkaConsumerService", String.format("message/%s/unmapping/%s",LogFile.dateFolderName(), receivedData.getOrderType()), receivedData.getOrderID(), messageMq);
             }
         
         }

@@ -22,17 +22,69 @@ public class LogFile {
         return df.format(date);
     }
 
-	public static void logMessage(String className, String path, String phoneNumber, ConsentResp messageLog) {
+	public static void logPdpaMessage(String className, String path, String phoneNumber, ConsentResp messageLog) {
         Logger logger = Logger.getLogger(className);
 
         try {
             
             // Use JBoss data directory
-            String jbossDataDir = "/data/logs/pdpa/";
+            String jbossDataDir = "/data/logs/sms_module_worker/";
             
             String pathLog = jbossDataDir + "/" + path + "/";
             // SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
             String fileName = phoneNumber + ".json";
+
+            // Ensure directory exists, create if it doesn't
+            File dir = new File(pathLog);
+            if (!dir.exists()) {
+                if (!dir.mkdirs()) {
+                    throw new IOException("Failed to create directory: " + pathLog);
+                }
+            }
+
+            FileHandler fileHandler = new FileHandler(pathLog + "/" + fileName, true);
+            fileHandler.setFormatter(new PlainTextFormatter());
+            logger.addHandler(fileHandler);
+            logger.setUseParentHandlers(false); // Prevents logging to console
+            logger.setLevel(Level.INFO);
+            fileHandler.setLevel(Level.INFO);
+
+            // Convert log entry to JSON
+            ObjectMapper objectMapper = new ObjectMapper();
+            objectMapper.enable(SerializationFeature.INDENT_OUTPUT); // Optional: for pretty print
+            String logEntryJson = objectMapper.writeValueAsString(messageLog);
+
+            // Append log entry to file
+            File file = new File(pathLog + "/" + fileName);
+            objectMapper.writeValue(file, logEntryJson);
+
+
+            // Close the handler to ensure the log is written
+            fileHandler.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.err.println("Error creating directory or file: " + e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("General error: " + e.getMessage());
+        }
+    }
+
+
+    public static void logMessage(String className, String path, String customFileName, String messageLog) {
+        Logger logger = Logger.getLogger(className);
+
+        try {
+            Date date = new Date();
+            // Use JBoss data directory
+            String jbossDataDir = "/data/logs/sms_module_worker/";
+            
+            String pathLog = jbossDataDir + "/" + path + "/";
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            String fileName = dateFormat.format(date) + ".log";
+            if (customFileName!= null){
+                fileName = customFileName + ".log";
+            }
 
             // Ensure directory exists, create if it doesn't
             File dir = new File(pathLog);
